@@ -7,7 +7,7 @@ library(bslib)
 
 
 # Importing and defining data
-data <- read_csv("data_creation/df.csv")
+data <- read_csv("../data_creation/df.csv")
 
 # Defining UI
 ui <- fluidPage(
