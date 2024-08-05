@@ -7,7 +7,7 @@ library(bslib)
 
 
 # Importing and defining data
-data <- read_csv("/Users/eappelson/Desktop/Projects/Shiny Apps/test_run/df.csv")
+data <- read_csv("data_creation/df.csv")
 
 # Defining UI
 ui <- fluidPage(
