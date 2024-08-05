@@ -1,0 +1,13 @@
+name: test2
+title: test2
+username: laaclu
+account: laaclu
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 12173257
+bundleId: 8940522
+url: https://laaclu.shinyapps.io/test2/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|www
