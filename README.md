@@ -7,25 +7,29 @@
 - **`README.md`**: This file.
 - **`app_creation/`**: Contains the application files for creation.
   - `app.R`: The main R script for the application.
-  - `app_creation.Rproj`: RStudio project file.
-  - `df.csv`: CSV file used in the app creation.
-- **`app_preview.png`**: Image preview of the app.
-- **`data_creation/`**: Contains scripts and data related to the creation process.
-  - **`original_data/`**: Raw data files.
-    - **`killing_data/`**: Contains data related to killings.
+  - `quick_fact_shiny_app.Rproj`: RStudio project file for the Shiny app.
+  - **`rsconnect/`**: Contains deployment configuration for Shiny apps.
+    - **`shinyapps.io/`**: Configuration for deployment.
+      - **`laaclu/`**: Specific app deployment folder.
+        - `test2.dcf`: Deployment configuration file.
+- **`data_creation/`**: Contains data and scripts for data processing.
+  - **`data/`**: Contains data files organized by type.
+    - **`killing_data/`**: Data related to killings.
       - `cheat_sheet_killing.csv`: Cheat sheet for killing data.
       - `killing.csv`: Main killing data file.
-    - **`misconduct_data/`**: Contains data related to misconduct.
+    - **`misconduct_data/`**: Data related to misconduct.
       - `data_event.csv`: Event data for misconduct.
       - `misconduct.csv`: Main misconduct data file.
     - **`overview_data/`**: Overview data files.
       - `cheat_sheet_overview.csv`: Cheat sheet for overview data.
       - `overview.csv`: Main overview data file.
+  - `data_creation_master_script.R`: Master script for data creation.
+  - `df.csv`: Additional CSV file used in data creation.
+  - `quick_fact_data_creation.Rproj`: RStudio project file for data creation.
   - **`scripts/`**: R scripts for data processing.
-    - `app_script.R`: Script for the app.
-    - `police_killing_df.R`: Script for processing police killing data.
-    - `police_misconduct_df.R`: Script for processing police misconduct data.
-    - `police_personnel_df.R`: Script for processing police personnel data.
+    - `killing_df_creation.R`: Script for creating killing data dataframe.
+    - `misconduct_df_creation.R`: Script for creating misconduct data dataframe.
+    - `personnel_df_creation.R`: Script for creating personnel data dataframe.
 
 ## Purpose
 This project provides essential information about policing in Louisiana, aiming to offer valuable insights and data to users.
