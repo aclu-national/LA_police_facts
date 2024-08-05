@@ -46,6 +46,3 @@ The information presented by this tool is derived from publicly available resour
 ## Questions
 For any inquiries or concerns regarding this tool, please contact us at [eappelson@laaclu.org](mailto:eappelson@laaclu.org).
 
-## Product
-Explore the tool [here](https://laaclu.shinyapps.io/test2/).
-
