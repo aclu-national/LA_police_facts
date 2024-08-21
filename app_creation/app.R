@@ -6,8 +6,9 @@ library(bslib)
 
 
 
+
 # Importing and defining data
-data <- read_csv("../data_creation/df.csv")
+data <- read_csv("df.csv")
 
 # Defining UI
 ui <- fluidPage(
@@ -45,15 +46,12 @@ ui <- fluidPage(
         tags$p("This project was created to help anyone gain crucial information about policing in Louisiana."),
         
         tags$br(),
-        tags$br(),
         
         tags$p("Sources", style="font-size:30px; font-family: 'gtam2';"),
         tags$p("The data sources used in this tool include the ", 
                tags$a(href = "https://llead.co/", "Louisiana Law Enforcement and Accountability Database"), ", ",
                tags$a(href = "https://mappingpoliceviolence.org/", "Mapping Police Violence"), ", and the ",
                tags$a(href = "https://cde.ucr.cjis.gov/", "FBI Crime Explorer Law Enforcement Personnel Data.")),
-        
-        tags$br(),
         tags$br(),
         
         tags$p("Usage", style="font-size:30px; font-family: 'gtam2';"),
@@ -61,42 +59,36 @@ ui <- fluidPage(
         tags$p("You can either generate a question using the 'random' button or select a question using the three categories at the top of the tool and selecting the 'save' button."),
         
         tags$br(),
-        tags$br(),
         
         tags$p("Sorting Your Questions", style="font-size:20px; font-family: 'gtam2';"),
         tags$p("You can sort your saved questions by using the 'sort by' button in the left-hand-side of the tool. The sort button orders the saved questions alphabetically (A-Z) for 'Question' and 'Agency' and from high to low for 'Year'."),
         
-        tags$br(),
-        tags$br(),
+       # tags$br(),
         
-        tags$p("Ranking Questions", style="font-size:20px; font-family: 'gtam2';"),
-        tags$p("The ranks can be found in the bottom left corner of each fact box. If you are sorting by a given category (Question, Agency, or Year) and have more than one saved question with the same category (same Question, Agency, or Year), then these facts will be sorted from higher to lower numeric value, with the higher value having a higher rank. For example, if you are sorting by 'Question' and you have two saved facts with the question: 'How many total officers were employed by', then these facts would be ordered from the fact with the higher value (rank 1) to the fact with the lower value (rank 2)."),
+        #tags$p("Ranking Questions", style="font-size:20px; font-family: 'gtam2';"),
+       # tags$p("The ranks can be found in the bottom left corner of each fact box. If you are sorting by a given category (Question, Agency, or Year) and have more than one saved question with the same category (same Question, Agency, or Year), then these facts will be sorted from higher to lower numeric value, with the higher value having a higher rank. For example, if you are sorting by 'Question' and you have two saved facts with the question: 'How many total officers were employed by', then these facts would be ordered from the fact with the higher value (rank 1) to the fact with the lower value (rank 2)."),
         
-        tags$br(),
         tags$br(),
         
         tags$p("Deselecting a Question",style="font-size:20px; font-family: 'gtam2';"),
         tags$p("You can deselect a question by clicking its check-box on the left-hand-side of the tool."),
         
         tags$br(),
-        tags$br(),
         
         tags$p("Removing all Questions",style="font-size:20px; font-family: 'gtam2';"),
         tags$p("You can clear all saved questions by clicking the 'remove' icon at the top of the tool."),
         
-        tags$br(),
         tags$br(),
         
         tags$p("Disclaimer", style="font-size:30px; font-family: 'gtam2';"),
         tags$p("All of the information accessible from this tool is generated using publicly accessible resources. As a result, we cannot verify the accuracy of any of the numbers generated."),
         
         tags$br(),
-        tags$br(),
         
         tags$p("Questions", style="font-size:30px; font-family: 'gtam2';"),
         tags$p("If you have any questions or concerns about the content of this tool, you can contact ", tags$a(href = "mailto:eappelson@laaclu.org", "eappelson@laaclu.org."))
     )
-    ),
+  ),
   
   
   # Defining the website style
@@ -278,6 +270,11 @@ ui <- fluidPage(
   align-items: center;
 }
 
+   /* Removing rank */
+   .rank {
+      display: none;
+   }
+
 /* Social links */
 .social-links {
   position: absolute;
@@ -405,7 +402,7 @@ select:focus {
     background-color: #F5F5F5;
     color: #000000;
     border-radius: 10px;
-    box-shadow: 0 0 0 1000px rgba(0,0,0,0.4);
+    box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
     visibility: hidden;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -449,16 +446,98 @@ select:focus {
   font-family: 'gtam' !important;
 }
 
+
+.modal-title {
+         font-family: 'gtam2';
+        font-size: 35px;
+        color: #0055AA;
+        text-align: center;
+        font-weight: bold;
+    }
+    .modal-body {
+        font-family: 'Open Sans', sans-serif;
+        font-size: 16px;
+    }
+
+
+
+
+
+
+
+
+/* Container to align buttons in a row */
+.button-container {
+    display: flex;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 20px; /* Space between buttons, adjust as needed */
+}
+
+/* General button style for text underneath the icon */
+.normal-button {
+    font-size: 30px; /* Adjust the font size for the text */
+    color: #0055AA; /* Default color, can be overridden */
+    background-color: transparent;
+    border-width: 0px;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.normal-button .fa {
+    font-size: 30px; /* Adjust icon size as needed */
+}
+
+.normal-button span {
+    font-size: 18px; /* Adjust font size for the text */
+    margin-top: 5px; /* Space between icon and text */
+    display: block;
+}
+
+/* Specific styles for Save Button */
+.normal-button-1 {
+    color: #025800;
+}
+
+.normal-button-1:hover {
+    color: #012101;
+    background-color: transparent;
+}
+
+/* Specific styles for Random Button */
+.normal-button-2 {
+    color: #0055AA;
+}
+
+.normal-button-2:hover {
+    color: #001326;
+    background-color: transparent;
+}
+
+/* Specific styles for Clear Button */
+.normal-button-3 {
+    color: #ef404e;
+    margin-top: -10px;
+}
+
+.normal-button-3:hover {
+    color: #260204;
+    background-color: transparent;
+}
+
 }
 ")),
   # Defining the UI
   tags$div(
     tags$br(),
     tags$div(
-    tags$div(
-      # Adding some extra css do define the question layout
-      class = "question-content",
-      tags$p(
+      tags$div(
+        # Adding some extra css do define the question layout
+        class = "question-content",
+        tags$p(
           # Question 1
           tags$select(
             id = "question1",
@@ -484,26 +563,35 @@ select:focus {
             })
           ),
           "?"
-      ),
-      
-      # How to use
-      tags$p(
-        'Select a question, agency, year, and press the "Save" icon to see the answer below.', 
-        br(),
-        class = "how-use"
-      ),
-   # Defining the save, random, and clear buttons   
-   tags$div(
-     style = "display: inline-block; vertical-align: middle;",
-     actionButton("save_button", "", class = "fas fa-save normal-button-1"),
-     actionButton("random_button", "", class = "fas fa-dice normal-button-2"),
-     actionButton("clear_button", "", class = "fa fa-trash normal-button-3")
-   ),
-   
-   # Importing Java Script for Select2
-      tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"),
-      tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"),
-      tags$style(HTML("
+        ),
+        
+        # How to use
+        tags$p(
+          'Select a question, agency, and year in the drop-downs above. Press the "Submit" button to see the answer below.', 
+          br(),
+          class = "how-use"
+        ),
+        # Defining the save, random, and clear buttons   
+        tags$div(
+          class = "button-container",
+          actionButton("save_button", 
+                       HTML('<i class="fas fa-paper-plane"></i><span>Submit</span>'), 
+                       class = "normal-button normal-button-1"
+          ),
+          actionButton("random_button", 
+                       HTML('<i class="fas fa-dice"></i><span>Randomize</span>'),
+                       class = "normal-button normal-button-2"
+          ),
+          actionButton("clear_button", 
+                       HTML('<i class="fa fa-trash"></i><span>Clear</span>'),
+                       class = "normal-button normal-button-3"
+          )
+        ),
+        
+        # Importing Java Script for Select2
+        tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"),
+        tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"),
+        tags$style(HTML("
       
 /* Defining Select2 styling */
 .select2-container--default .select2-selection--single {
@@ -536,19 +624,19 @@ select:focus {
 @media only screen and (min-width: 451px) {
   .rounded-box {
     width: calc(100% - 40px); 
-    background-size: 0px auto, cover;
+    background-size: 70px auto, cover;
   }
 }
 
 @media only screen and (min-width: 1001px) {
   .rounded-box {
     width: calc(50% - 40px); 
-    background-size: 0px auto, cover;
+    background-size: 70px auto, cover;
   }
 }
 @media only screen and (min-width: 1400px) {
   .rounded-box {
-      background-size: 0px auto, cover;
+      background-size: 70px auto, cover;
   }
 }
 @media only screen and (min-width: 1600px) {
@@ -693,9 +781,9 @@ select:focus {
   }
 }
   ")),
-   
-      # Defining more Java
-      tags$script(HTML("
+        
+        # Defining more Java
+        tags$script(HTML("
  $(document).ready(function() {
   // Initialize select2 dropdowns
   $('#question1, #question2, #question3').select2({
@@ -755,37 +843,38 @@ select:focus {
   });
 });
   ")),
+      ),
     ),
-    ),
-   # Space
-   tags$br(), 
+    # Space
+    tags$br(), 
     
     # Defining the sidebar panel
     sidebarPanel(
       
       tags$div(
         
-      # Defining sort
+        # Defining sort
         tags$div(
-        tags$div(
-        tags$span(
-          "Sort by:",
-          style = "font-size: 25px; font-weight: normal;font-family: 'gtam';top: -50px;" 
+          tags$div(
+            tags$span(
+              "Sort by:",
+              style = "font-size: 25px; font-weight: normal;font-family: 'gtam';top: -50px;" 
+            ),
+            tags$select(
+              id = "sort",
+              lapply(c("None",
+                       "Question",
+                       "Agency",
+                       "Year"), function(option) {
+                         tags$option(option, value = option)
+                       }),
+              onmouseover = "this.style.backgroundColor='#FEF98B'; this.style.color='black';",
+              onmouseout = "this.style.backgroundColor=''; this.style.color='';"
+            ))
+          ,
+          style = "font-size: 27px;background-color: white; padding: 20px; border-radius: 20px;font-family: 'gtam', sans-serif"
         ),
-        tags$select(
-          id = "sort",
-          lapply(c("Question",
-                   "Agency",
-                   "Year"), function(option) {
-                     tags$option(option, value = option)
-                   }),
-          onmouseover = "this.style.backgroundColor='#FEF98B'; this.style.color='black';",
-          onmouseout = "this.style.backgroundColor=''; this.style.color='';"
-        ))
-      ,
-      style = "font-size: 27px;background-color: white; padding: 20px; border-radius: 20px;font-family: 'gtam', sans-serif"
-      ),
-      id = "sort_group_wrapper"),
+        id = "sort_group_wrapper"),
       # Checkbox output
       tags$div(
         uiOutput("saved_checkboxes"),
@@ -795,7 +884,7 @@ select:focus {
     ),
     
     # Outputting the boxes
- uiOutput("boxes"),
+    uiOutput("boxes"),
   ))
 
 
@@ -915,8 +1004,10 @@ server <- function(input, output, session) {
         input$question2 == "All Agencies" &
         input$question3 == "All Years") {
       showModal(modalDialog(
-        'Only one question can be left as "all". Please select at least two of the following: a specific question, agency, or year before saving.',
-        easyClose = TRUE
+        title = "Incomplete Selection",
+        'Only one question can be left as "All". Please select at least two of the following: a specific question, agency, or year before saving.',
+        easyClose = TRUE,
+        footer = NULL
       ))
       return()  
     }
@@ -924,9 +1015,12 @@ server <- function(input, output, session) {
     if (input$question1 == "All Questions" & 
         input$question2 == "All Agencies" &
         input$question3 != "All Years") {
+      
       showModal(modalDialog(
-        'Only one question can be left as "all". Please select a specific question, agency, or both before saving.',
-        easyClose = TRUE
+        title = "Incomplete Selection",
+        'Only one question can be left as "All". Please select a specific question, agency, or both before saving.',
+        easyClose = TRUE,
+        footer = NULL
       ))
       return()  
     }
@@ -934,9 +1028,12 @@ server <- function(input, output, session) {
     if (input$question1 == "All Questions" & 
         input$question2 != "All Agencies" &
         input$question3 == "All Years") {
+      
       showModal(modalDialog(
+        title = "Incomplete Selection",
         'Only one question can be left as "all". Please select a specific question, year, or both before saving.',
-        easyClose = TRUE
+        easyClose = TRUE,
+        footer = NULL
       ))
       return() 
     }
@@ -944,9 +1041,12 @@ server <- function(input, output, session) {
     if (input$question1 != "All Questions" & 
         input$question2 == "All Agencies" &
         input$question3 == "All Years") {
+      
       showModal(modalDialog(
+        title = "Incomplete Selection",
         'Only one question can be left as "all". Please select a specific agency, year, or both before saving.',
-        easyClose = TRUE
+        easyClose = TRUE,
+        footer = NULL
       ))
       return() 
     }
@@ -1004,6 +1104,9 @@ server <- function(input, output, session) {
   observeEvent(input$clear_button, {
     for (name in names(saved_filters)) {
       saved_filters[[name]] <- FALSE
+      updateSelectInput(session, "question1", choices = c("All Questions",unique(data$question_p1)), selected = "All Questions")
+      updateSelectInput(session, "question2", choices = c("All Agencies",unique(data$question_p2)), selected = "All Agencies")
+      updateSelectInput(session, "question3", choices = c("All Years",unique(data$question_p3)), selected = "All Years")
     }
   })
   
@@ -1023,8 +1126,8 @@ server <- function(input, output, session) {
       checkboxGroupInput(
         "saved_filters",
         label = "",
-        choices = selected_filters,
-        selected = selected_filters
+        choices = rev(selected_filters),
+        selected = rev(selected_filters)
       )
     )
   })
@@ -1063,6 +1166,17 @@ server <- function(input, output, session) {
       # Filtering our data to have the saved filters
       df <- filter(data,question_complex %in% c(input$saved_filters))
       
+      df <- df %>%
+        mutate(order = factor(question_complex, levels = input$saved_filters))
+      
+      
+      if (input$sort == "None") {
+        df <- df %>%
+          ungroup() %>%
+          arrange(order) %>%
+          mutate(id = "")
+      }
+      
       # Defining hl sort with agency group
       if (input$sort == "Question"){
         df <- df %>%
@@ -1094,6 +1208,7 @@ server <- function(input, output, session) {
       df <- df %>%
         mutate(
           supscript = case_when(
+            id == "" ~ "",
             id == 1 ~ "st",
             id == 2 ~ "nd",
             id == 3 ~ "rd",
