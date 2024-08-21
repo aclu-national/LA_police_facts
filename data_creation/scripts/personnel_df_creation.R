@@ -39,25 +39,25 @@ df <- overview_better %>%
   # Turning data into usable text
   mutate(
     text = case_when( 
-      rowname == "population" ~ paste0(correct_agency_name, " policed ", value, " people in ", year,"."),
-      rowname == "male_officer_ct" ~ paste0(correct_agency_name, " had ", value, " male officers in ", year,"."),
-      rowname == "male_civilian_ct" ~ paste0(correct_agency_name, " had ", value, " male civilian employees in ", year,"."),
-      rowname == "male_total_ct" ~ paste0(correct_agency_name, " had ", value, " male officer and civilian employees in ", year,"."),
-      rowname == "female_officer_ct" ~ paste0(correct_agency_name, " had ", value, " female officers in ", year,"."),
-      rowname == "female_civilian_ct" ~ paste0(correct_agency_name, " had ", value, " female civilian employees in ", year,"."),
-      rowname == "female_total_ct" ~ paste0(correct_agency_name, " had ", value, " female officer and civilian employees in ", year,"."),
-      rowname == "officer_ct" ~ paste0(correct_agency_name, " had ", value, " officers in ", year,"."),
-      rowname == "civilian_ct" ~ paste0(correct_agency_name, " had ", value, " civilian employees in ", year,"."),
-      rowname == "total_pe_ct" ~ paste0(correct_agency_name, " had ", value, " officer and civilian employees in ", year,"."),
-      rowname == "pe_ct_per_1000" ~ paste0(correct_agency_name, " had ", value, " officer and civilian employees per hundred thousand residents policed in ", year,"."),
-      rowname == "male_officer_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " male officers per hundred thousand residents policed in ", year,"."),
-      rowname == "male_civilian_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " male civilian employees per hundred thousand residents policed in ", year,"."),
-      rowname == "male_total_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " male officer and civilian employees per hundred thousand residents policed in ", year,"."),
-      rowname == "female_officer_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " female officers per hundred thousand residents policed in ", year,"."),
-      rowname == "female_civilian_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " female civilian employees per hundred thousand residents policed in ", year,"."),
-      rowname == "female_total_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " female officer and civilian employees per hundred thousand residents policed in ", year,"."),
-      rowname == "officer_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " total officers per hundred thousand residents policed in ", year,"."),
-      rowname == "civilian_ct_per_huntho" ~ paste0(correct_agency_name, " had ", value, " total civilian employees per hundred thousand residents policed in ", year,".")
+      rowname == "population" ~ paste0(correct_agency_name, " reportedly policed ", value, " people in ", year,"."),
+      rowname == "male_officer_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " male officers in ", year,"."),
+      rowname == "male_civilian_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " male civilian employees in ", year,"."),
+      rowname == "male_total_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " male officer and civilian employees in ", year,"."),
+      rowname == "female_officer_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " female officers in ", year,"."),
+      rowname == "female_civilian_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " female civilian employees in ", year,"."),
+      rowname == "female_total_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " female officer and civilian employees in ", year,"."),
+      rowname == "officer_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " officers in ", year,"."),
+      rowname == "civilian_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " civilian employees in ", year,"."),
+      rowname == "total_pe_ct" ~ paste0(correct_agency_name, " reportedly employed ", value, " officer and civilian employees in ", year,"."),
+      rowname == "pe_ct_per_1000" ~ paste0(correct_agency_name, " reportedly employed ", value, " officer and civilian employees per hundred thousand residents policed in ", year,"."),
+      rowname == "male_officer_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " male officers per hundred thousand residents policed in ", year,"."),
+      rowname == "male_civilian_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " male civilian employees per hundred thousand residents policed in ", year,"."),
+      rowname == "male_total_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " male officer and civilian employees per hundred thousand residents policed in ", year,"."),
+      rowname == "female_officer_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " female officers per hundred thousand residents policed in ", year,"."),
+      rowname == "female_civilian_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " female civilian employees per hundred thousand residents policed in ", year,"."),
+      rowname == "female_total_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " female officer and civilian employees per hundred thousand residents policed in ", year,"."),
+      rowname == "officer_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed ", value, " total officers per hundred thousand residents policed in ", year,"."),
+      rowname == "civilian_ct_per_huntho" ~ paste0(correct_agency_name, " reportedly employed", value, " total civilian employees per hundred thousand residents policed in ", year,".")
     )
   )
 
