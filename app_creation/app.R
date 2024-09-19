@@ -3,20 +3,61 @@ library(shiny)
 library(tidyverse)
 library(shinyjs)
 library(bslib)
+library(janitor)
+library(metathis)
 
+set.seed(1)
 
-
+js_code <- "
+function copyToClipboard(text) {
+  var tempInput = document.createElement('input');
+  tempInput.value = text;
+  document.body.appendChild(tempInput);
+  tempInput.select();
+  document.execCommand('copy');
+  document.body.removeChild(tempInput);
+}
+"
 
 # Importing and defining data
 data <- read_csv("df.csv")
+num_rows <- nrow(data) 
+data$x1 <- sample(seq(10000000, 99999999), num_rows)
 
 # Defining UI
 ui <- fluidPage(
+  
   tags$head(
+    
+    tags$meta(property = "og:title", content = "Police Quick Facts"),
+    tags$meta(property = "og:description", content = "Ask, answer, and share questions about policing in Louisiana"),
+    tags$meta(property = "og:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
+    tags$meta(property = "og:url", content = "https://laaclu.shinyapps.io/test2/"),
+    tags$meta(property = "og:type", content = "website"),
+    tags$meta(property = "og:author", content = "Elijah Appelson"),
+    
+    # Twitter Card meta tags
+    tags$meta(name = "twitter:card", content = "summary"),
+    tags$meta(name = "twitter:site", content = "@elijah"),
+    tags$meta(name = "twitter:title", content = "Police Quick Facts for Data Science"),
+    tags$meta(name = "twitter:description", content = "Ask, answer, and share questions about policing in Louisiana"),
+    tags$meta(name = "twitter:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
+    tags$meta(name = "twitter:image:alt", content = "Cover"),
+    
     # Importing social media buttons
     tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
     # Defining Help Button visibility
     tags$script(HTML('
+    
+    function copyToClipboard(text) {
+      var textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+    
       $(document).ready(function(){
         $("#help_button").click(function(){
           $(".help-box").toggleClass("visible");
@@ -42,16 +83,18 @@ ui <- fluidPage(
     ),
     downloadButton("downloadData", ""),
     div(class = "help-box-content",
-        tags$p("Purpose", style="font-size:30px; font-family: 'gtam2';"),
-        tags$p("This project was created to help anyone gain crucial information about policing in Louisiana."),
+        tags$p("Summary", style="font-size:30px; font-family: 'gtam2';"),
+        tags$p("This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personal from 344 law 
+               enforcement agencies across Louisiana spanning 65 years, for a total of 119,717 quick facts. We created this project to make
+               actionable insights easy to search, find, and share."),
         
         tags$br(),
         
         tags$p("Sources", style="font-size:30px; font-family: 'gtam2';"),
         tags$p("The data sources used in this tool include the ", 
-               tags$a(href = "https://llead.co/", "Louisiana Law Enforcement and Accountability Database"), ", ",
-               tags$a(href = "https://mappingpoliceviolence.org/", "Mapping Police Violence"), ", and the ",
-               tags$a(href = "https://cde.ucr.cjis.gov/", "FBI Crime Explorer Law Enforcement Personnel Data.")),
+               tags$a(href = "https://llead.co/", "Louisiana Law Enforcement and Accountability Database"), "(Updated February 10th, 2024), ",
+               tags$a(href = "https://mappingpoliceviolence.org/", "Mapping Police Violence"), "(Updated September 10th, 2024), and the ",
+               tags$a(href = "https://cde.ucr.cjis.gov/", "FBI Crime Explorer Law Enforcement Personnel Data"), "(Updated February 10th, 2024)."),
         tags$br(),
         
         tags$p("Usage", style="font-size:30px; font-family: 'gtam2';"),
@@ -63,10 +106,10 @@ ui <- fluidPage(
         tags$p("Sorting Your Questions", style="font-size:20px; font-family: 'gtam2';"),
         tags$p("You can sort your saved questions by using the 'sort by' button in the left-hand-side of the tool. The sort button orders the saved questions alphabetically (A-Z) for 'Question' and 'Agency' and from high to low for 'Year'."),
         
-       # tags$br(),
+        # tags$br(),
         
         #tags$p("Ranking Questions", style="font-size:20px; font-family: 'gtam2';"),
-       # tags$p("The ranks can be found in the bottom left corner of each fact box. If you are sorting by a given category (Question, Agency, or Year) and have more than one saved question with the same category (same Question, Agency, or Year), then these facts will be sorted from higher to lower numeric value, with the higher value having a higher rank. For example, if you are sorting by 'Question' and you have two saved facts with the question: 'How many total officers were employed by', then these facts would be ordered from the fact with the higher value (rank 1) to the fact with the lower value (rank 2)."),
+        # tags$p("The ranks can be found in the bottom left corner of each fact box. If you are sorting by a given category (Question, Agency, or Year) and have more than one saved question with the same category (same Question, Agency, or Year), then these facts will be sorted from higher to lower numeric value, with the higher value having a higher rank. For example, if you are sorting by 'Question' and you have two saved facts with the question: 'How many total officers were employed by', then these facts would be ordered from the fact with the higher value (rank 1) to the fact with the lower value (rank 2)."),
         
         tags$br(),
         
@@ -169,6 +212,24 @@ ui <- fluidPage(
   transition: all 0.3s ease; 
 }
 
+.shiny-notification {
+    background-color: #FCAA17; 
+    font-family: 'gtam';
+    color: white; 
+    border-radius: 5px;
+    padding: 10px; 
+    font-size: 25px; 
+    z-index: 9999;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border: none;
+    opacity: 0.90;
+
+}
+
+.shiny-notification-title {
+    font-weight: normal; /* Make title bold */
+}
+
 /* Defining the rounded answer box */
 .rounded-box {
   position: relative; 
@@ -184,7 +245,6 @@ ui <- fluidPage(
   text-align: left;
   font-weight: normal;
   margin: 20px;
-  float: left;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   color: #FFFFFF; 
   transition: all 0.3s ease; 
@@ -970,6 +1030,8 @@ server <- function(input, output, session) {
   # Defining the random button
   observeEvent(input$random_button, {
     
+    showNotification("Question Saved.", type = "message", duration = 3)
+    
     # Defining the random row function
     select_random_row <- reactive({
       random_index <- sample(nrow(data), 1)
@@ -999,7 +1061,7 @@ server <- function(input, output, session) {
   
   # Defining the save button
   observeEvent(input$save_button, {
-    
+
     if (input$question1 == "All Questions" & 
         input$question2 == "All Agencies" &
         input$question3 == "All Years") {
@@ -1057,6 +1119,8 @@ server <- function(input, output, session) {
         input$question2 != "All Agencies" &
         input$question3 != "All Years"){
       saved_filters[[paste0(input$question1," ", input$question2, " in ",input$question3,"?")]] <- TRUE
+      
+      showNotification("Question Saved.", type = "message", duration = 3)
     }
     
     # If question 2 and 3 are defined
@@ -1070,6 +1134,7 @@ server <- function(input, output, session) {
       for (question in df_list){
         saved_filters[[paste0(question)]] <- TRUE
       }
+      showNotification("Questions Saved.", type = "message", duration = 3)
     }
     
     # If question 1 and 3 are defined
@@ -1083,6 +1148,7 @@ server <- function(input, output, session) {
       for (question in df_list){
         saved_filters[[paste0(question)]] <- TRUE
       }
+      showNotification("Questions Saved.", type = "message", duration = 3)
     }
     
     # If question 1 and 2 are defined
@@ -1096,6 +1162,7 @@ server <- function(input, output, session) {
       for (question in df_list){
         saved_filters[[paste0(question)]] <- TRUE
       }
+      showNotification("Questions Saved.", type = "message", duration = 3)
     }
     
   })
@@ -1108,15 +1175,46 @@ server <- function(input, output, session) {
       updateSelectInput(session, "question2", choices = c("All Agencies",unique(data$question_p2)), selected = "All Agencies")
       updateSelectInput(session, "question3", choices = c("All Years",unique(data$question_p3)), selected = "All Years")
     }
+    
+    showNotification("Questions Cleared.", type = "message", duration = 3)
   })
   
-  # Creating the introductory questions/answers when the site is loaded
   observe({
-    sample_questions <- sample(data$question_complex, 1)
-    for (question in sample_questions) {
-      saved_filters[[question]] <- TRUE
+    query <- parseQueryString(session$clientData$url_search)
+    
+    if (!is.null(query$fact_id)) {
+      fact_id <- query$fact_id
+      
+      selected_fact <- data[data$x1 == fact_id, ]
+      
+      if (nrow(selected_fact) == 0) {
+        sample_questions <- sample(data$question_complex, 1)
+        for (question in sample_questions) {
+          saved_filters[[question]] <- TRUE
+        }
+      } else {
+        saved_filters[[selected_fact$question_complex]] <- TRUE
+      }
+    } else {
+      # No fact_id in the URL, display a random question
+      sample_questions <- sample(data$question_complex, 1)
+      for (question in sample_questions) {
+        saved_filters[[question]] <- TRUE
+      }
     }
   })
+  
+  # # Display a random question/fact when the site is loaded without a query
+  # observe({
+  #   if (is.null(parseQueryString(session$clientData$url_search)$fact_id)) {
+  #     sample_questions <- sample(data$question_complex, 1)
+  #     for (question in sample_questions) {
+  #       saved_filters[[question]] <- TRUE
+  #     }
+  #   }
+  # })
+  
+  
   
   # Creating the saved checkboxes based on the input
   output$saved_checkboxes <- renderUI({
@@ -1139,16 +1237,18 @@ server <- function(input, output, session) {
     content = function(file) {
       # Filter data based on saved filters
       filtered_data <- filter(data, question_complex %in% input$saved_filters) %>%
-        select(correct_agency_name,
-               years_report,
-               variable,
-               question, 
-               full_question = question_complex,
-               agency = question_p2,
-               value = value,
-               category,
-               source,
-               link)
+        mutate(question_link = paste0("https://laaclu.shinyapps.io/test2/?fact_id=",x1)) %>%
+        select(
+          Question = question_p1,
+          Agency = question_p2,
+          Year = question_p3,
+          "Full Question" = question_complex, 
+          Answer = value,
+          "Full Answer" = text,
+          Category = category,
+          Source = source,
+          "Source Link" = link,
+          "Question Link" = question_link)
       write.csv(filtered_data, file, row.names = FALSE)
     }
   )
@@ -1222,6 +1322,7 @@ server <- function(input, output, session) {
       # Creating the boxes
       boxes <- lapply(1:nrow(df), function(i) {
         
+        id <- df$x1[i]
         # Answer rank
         rank <- df$id[i]
         
@@ -1261,21 +1362,21 @@ server <- function(input, output, session) {
         <div class="source-text">Source: %s</div>
       </a>
       <div class="social-links">
-        <a href="mailto:?subject=Policing in Louisiana&body=%s (via the ACLU of Louisiana) - https://aclujusticelab.org/dashboard/" target="_blank" style="color: #FCAA17;">
+        <a href="mailto:?subject=Policing in Louisiana&body=%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/test2/?fact_id=%s" target="_blank" style="color: #FCAA17;">
           <i class="fas fa-envelope"></i>
         </a>
-        <a href="https://twitter.com/intent/post?url=https://aclujusticelab.org/dashboard/&text=%s (via @ACLUofLouisiana)" target="_blank" style="color: #FCAA17;">
+        <a href="https://twitter.com/intent/post?url=https://laaclu.shinyapps.io/test2/?fact_id=%s&text=%s (via @ACLUofLouisiana)" target="_blank" style="color: #FCAA17;">
           <i class="fab fa-twitter"></i>
         </a>
-        <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://aclujusticelab.org/dashboard/&text=%s (via the ACLU of Louisiana)" target="_blank" style="color: #FCAA17;">
-          <i class="fab fa-linkedin"></i>
+        <a href="javascript:void(0);" onclick="copyToClipboard(\'%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/test2/?fact_id=%s\')">
+          <i class="fas fa-copy"></i>
         </a>
       </div>
       <div class="rank">%s <sup> %s </sup></div>
     </div>
   ', 
           # %s inputs
-          ribbon_class, question, fact_text, link, source, fact_text, fact_text, fact_text, rank, supscript)
+          ribbon_class, question, fact_text, link, source, fact_text, id, id, fact_text,fact_text, id, rank, supscript)
         
         # Outputting an HTML representation of each box
         HTML(rounded_box)
