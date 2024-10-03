@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------
 # Author: Elijah Appelson
-# Update Date: August 5th, 2024
+# Update Date: October 3rd, 2024
 # -----------------------------------------------------------------------
 
 
@@ -20,9 +20,7 @@ killing <- killing_data %>%
     
     # Fixing the agencies spelling
     agency_responsible = case_when(
-      str_detect(agency_responsible,"(US Marshals Service)") ~ "U.S. Marshals Service, 
-      Alexandria Police Department,
-      Rapides Parish Sheriff's Office",
+      str_detect(agency_responsible,"(US Marshals Service)") ~ "U.S. Marshals Service, Alexandria Police Department, Rapides Parish Sheriff's Office",
       TRUE ~ agency_responsible
     ),
     
@@ -128,7 +126,8 @@ year_by_year_killing <- killing %>%
   group_by(correct_agency_name, year) %>%
   killing_func() %>%
   mutate(year = as.character(year),
-         years_report = year)
+         years_report = year) %>%
+  distinct(,.keep_all = TRUE)
 
 # Fitting the column creation on all years
 all_year_killing <- killing %>%
@@ -138,11 +137,12 @@ all_year_killing <- killing %>%
   killing_func() %>%
   mutate(year = "2013-2024") %>%
   mutate(year = as.character(year),
-         years_report = "Total Years Collecting Police Killings")
+         years_report = "Total Years Collecting Police Killings") %>%
+  distinct(,.keep_all = TRUE)
 
+year_by_year_killing
 # Concatenating year by year and all killings 
 df <- rbind(year_by_year_killing,all_year_killing) %>%
-  distinct(correct_agency_name, year, .keep_all = TRUE) %>%
   pivot_longer(cols = "n_killing":"disposition_cleared_justified") %>%
   select(correct_agency_name, year, years_report, rowname = name, value) %>%
   group_by(correct_agency_name) %>%
@@ -156,9 +156,9 @@ df <- rbind(year_by_year_killing,all_year_killing) %>%
       rowname == "b_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " Black person in ", " Black people in "), year,"."),
       rowname == "a_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " Asian person in ", " Asian people in "), year,"."),
       rowname == "h_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " Hispanic person in ", " Hispanic people in "), year,"."),
-      rowname == "u_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " people with an unidentified race ", " people with unidentified race in "), year,"."),
-      rowname == "m_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " man ", " men in "), year,"."),
-      rowname == "f_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " woman ", " women in "), year,"."),
+      rowname == "u_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " person with an unidentified race ", " people with unidentified race in "), year,"."),
+      rowname == "m_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " man in ", " men in "), year,"."),
+      rowname == "f_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " woman in ", " women in "), year,"."),
       rowname == "age_18_killed" ~ paste0(correct_agency_name, " killed ", value, " youth under the age of 18 in ", year,"."),
       rowname == "age_18_34_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " person", " people"), " between the age of 18 and 34 in ", year,"."),
       rowname == "age_35_54_killed" ~ paste0(correct_agency_name, " killed ", value, ifelse(value == 1, " person", " people"), " between the age of 35 and 54 in ", year,"."),
