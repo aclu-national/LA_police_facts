@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------
 # Author: Elijah Appelson
-# Update Date: August 5th, 2024
+# Update Date: October 3rd, 2024
 # -----------------------------------------------------------------------
 
 # Loading Libraries
@@ -25,10 +25,10 @@ df <- overview_better %>%
          population,
          `male_officer_ct`:`pe_ct_per_1000`) %>%
   mutate(
-    male_total_ct_per_huntho = 100000*male_total_ct/population,
-    female_total_ct_per_huntho = 100000*female_total_ct/population,
-    officer_ct_per_huntho = 100000*officer_ct/population,
-    civilian_ct_per_huntho = 100000*civilian_ct/population,
+    male_total_ct_per_huntho = 10^5*male_total_ct/population,
+    female_total_ct_per_huntho = 10^5*female_total_ct/population,
+    officer_ct_per_huntho = 10^5*officer_ct/population,
+    civilian_ct_per_huntho = 10^5*civilian_ct/population,
     pe_ct_per_1000 = 100*pe_ct_per_1000) %>%
   mutate_all(~ replace(., is.infinite(.), NA)) %>%
   mutate_all(as.character) %>%
