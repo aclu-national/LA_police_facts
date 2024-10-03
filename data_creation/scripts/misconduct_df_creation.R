@@ -26,9 +26,14 @@ event <- read_csv("data/misconduct_data/data_event.csv")
 
 # Extracting the date from the misconduct event data
 misconduct_date <- event %>%
-  filter(kind %in% c("complaint_receive","officer_post_decertification")) %>%
-  distinct(allegation_uid, .keep_all = TRUE) %>%
-  select(year,month,day,allegation_uid)
+  filter(kind %in% c("complaint_receive", "officer_post_decertification")) %>%
+  group_by(allegation_uid) %>%
+  summarize(
+    year = min(year),
+    month = min(month),
+    day = min(day)
+  ) %>%
+  ungroup()
 
 # Creating a total year misconduct dataframe
 total_years_misconduct <- misconduct %>%
@@ -62,7 +67,7 @@ year_by_year_misconduct <- misconduct %>%
     n_allegation = n(),
     n_disposition = sum(ifelse(!is.na(disposition),1,0)),
     n_action = sum(ifelse(!is.na(action),1,0)),
-    n_officers = length(unique(uid)),
+    n_officers = n_distinct(uid),
     
     # Giving common allegations, dispositions, repercussions, and officers
     common_allegations = tabyl(allegation) %>%
@@ -182,13 +187,13 @@ df <- rbind(year_by_year_misconduct, all_year_misconduct) %>%
     text = case_when(
       rowname == "n_allegation" ~ paste0(correct_agency_name, " received at least ", value, ifelse(value == 1, " misconduct allegation in "," misconduct allegations in "), year,"."),
       rowname == "n_disposition" ~ paste0(correct_agency_name, " reported ", value, ifelse(value == 1, " disposition for misconduct allegations in " ," dispositions for misconduct allegations in "), year,"."),
-      rowname == "n_action" ~ paste0(correct_agency_name, " reported ", value, ifelse(value == 1, " repercussions for misconduct allegations in " ," repercussions for misconduct allegations in "), year,"."),
+      rowname == "n_action" ~ paste0(correct_agency_name, " reported ", value, ifelse(value == 1, " repercussion for misconduct allegations in " ," repercussions for misconduct allegations in "), year,"."),
       rowname == "n_officers" ~ paste0("At least ", value, ifelse(value == 1, " individual officer at "," individual officers at "), correct_agency_name, " received misconduct allegations in ", year,"."),
       rowname == "common_allegations" ~ paste0(ifelse(value == 1, "The most common reported allegation against ","The most common reported allegations against "), correct_agency_name, " in ", year, ifelse(value == 1, " is ", " include "), value,"."),
       rowname == "common_dispositions" ~  paste0(ifelse(value == 1, "The most common reported disposition against ","The most common reported disposition against "), correct_agency_name, " in ", year, ifelse(value == 1, " is ", " include "), value,"."),
       rowname == "common_action" ~ paste0(ifelse(value == 1, "The most common reported repercussion against ","The most common reported repercussion against "), correct_agency_name, " in ", year, ifelse(value == 1, " is ", " include "), value,"."),
       rowname == "common_officer" ~ paste0(ifelse(value == 1, "The officer with the most reported misconduct allegations at ","The officers with the most reported misconduct allegations at "), correct_agency_name, " in ", year, ifelse(value == 1, " is ", " include "), value,"."),
-      rowname == "n_uof" ~ paste0(correct_agency_name, " received at least ", value, ifelse(value == 1, " allegation related to Use of Force in "," allegations related to Use of Force in "), year,"."),
+      rowname == "n_uof" ~ paste0(correct_agency_name, " received at least ", value, ifelse(value == 1, " allegation related to use of force in "," allegations related to use of force in "), year,"."),
       rowname == "n_weapon" ~ paste0(correct_agency_name, " received at least ", value, ifelse(value == 1, " allegation related to a weapon violation in "," allegations related to a weapon violation in "), year,"."),
       rowname == "n_discourtesy" ~ paste0(correct_agency_name, " received at least ", value, ifelse(value == 1, " allegation related to discourtesy in "," allegations related to discourtesy in "), year,"."),
       rowname == "n_harassment" ~ paste0(correct_agency_name, " received at least ", value, ifelse(value == 1, " allegation related to harassment in "," allegations related to harassment in "), year,"."),
