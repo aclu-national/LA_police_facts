@@ -32,7 +32,7 @@ ui <- fluidPage(
     tags$meta(property = "og:title", content = "Police Quick Facts"),
     tags$meta(property = "og:description", content = "Ask, answer, and share questions about policing in Louisiana"),
     tags$meta(property = "og:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
-    tags$meta(property = "og:url", content = "https://laaclu.shinyapps.io/test2/"),
+    tags$meta(property = "og:url", content = "https://laaclu.shinyapps.io/quick-facts/"),
     tags$meta(property = "og:type", content = "website"),
     tags$meta(property = "og:author", content = "Elijah Appelson"),
     
@@ -84,7 +84,7 @@ ui <- fluidPage(
     downloadButton("downloadData", ""),
     div(class = "help-box-content",
         tags$p("Summary", style="font-size:30px; font-family: 'gtam2';"),
-        tags$p("This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personal from 344 law 
+        tags$p("This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personnel from 344 law 
                enforcement agencies across Louisiana spanning 65 years, for a total of 119,717 quick facts. We created this project to make
                actionable insights easy to search, find, and share."),
         
@@ -402,7 +402,7 @@ ui <- fluidPage(
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
   margin-top: 20px;
   padding-bottom: 0px;
-  font-family: 'gtam', sans-serif
+  font-family: 'gtam', sans-serif;
 }
 
 /* Defining the output box container */
@@ -813,15 +813,18 @@ select:focus {
     font-family: 'gtam', sans-serif;
   }
   
-  .outer-box {
+.outer-box {
   background-color: #fcaa17;
   text-align: left; 
   border-radius: 20px; 
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
   margin-top: 0px;
   padding-bottom: 20px;
-  font-family: 'gtam', sans-serif
-}
+  font-family: 'gtam', sans-serif;
+  position: absolute; /* Removes it from the document flow */
+  opacity: 0; /* Makes it invisible */
+  height: 0; /* Ensures no space is taken up */
+  overflow: hidden; /* Prevents any content from affecting layout */
 }
 
 /* Changing the sidebar panel based on the screen width */
@@ -1237,7 +1240,7 @@ server <- function(input, output, session) {
     content = function(file) {
       # Filter data based on saved filters
       filtered_data <- filter(data, question_complex %in% input$saved_filters) %>%
-        mutate(question_link = paste0("https://laaclu.shinyapps.io/test2/?fact_id=",x1)) %>%
+        mutate(question_link = paste0("https://laaclu.shinyapps.io/quick-facts/?fact_id=",x1)) %>%
         select(
           Question = question_p1,
           Agency = question_p2,
@@ -1362,13 +1365,13 @@ server <- function(input, output, session) {
         <div class="source-text">Source: %s</div>
       </a>
       <div class="social-links">
-        <a href="mailto:?subject=Policing in Louisiana&body=%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/test2/?fact_id=%s" target="_blank" style="color: #FCAA17;">
+        <a href="mailto:?subject=Policing in Louisiana&body=%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/quick-facts/?fact_id=%s" target="_blank" style="color: #FCAA17;">
           <i class="fas fa-envelope"></i>
         </a>
-        <a href="https://twitter.com/intent/post?url=https://laaclu.shinyapps.io/test2/?fact_id=%s&text=%s (via @ACLUofLouisiana)" target="_blank" style="color: #FCAA17;">
+        <a href="https://twitter.com/intent/post?url=https://laaclu.shinyapps.io/quick-facts/?fact_id=%s&text=%s (via @ACLUofLouisiana)" target="_blank" style="color: #FCAA17;">
           <i class="fab fa-twitter"></i>
         </a>
-        <a href="javascript:void(0);" onclick="copyToClipboard(\'%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/test2/?fact_id=%s\')">
+        <a href="javascript:void(0);" onclick="copyToClipboard(\'%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/quick-facts/?fact_id=%s\')">
           <i class="fas fa-copy"></i>
         </a>
       </div>
