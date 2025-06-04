@@ -15,7 +15,7 @@ The data for this tool is sourced from:
 ### 1. Clone
 Clone the repository to your local machine:
 ```bash
-git clone https://github.com/yourusername/tracking-287g.git
+git clone https://github.com/aclu-national/louisiana_police_quick_facts
 ```
 
 ### 2. Data 
