@@ -8,28 +8,66 @@ library(metathis)
 
 set.seed(1)
 
-js_code <- "
-function copyToClipboard(text) {
-  var tempInput = document.createElement('input');
-  tempInput.value = text;
-  document.body.appendChild(tempInput);
-  tempInput.select();
-  document.execCommand('copy');
-  document.body.removeChild(tempInput);
-}
-"
-
 # Importing and defining data
-data <- read_csv("df.csv")
+data <- read_csv(here::here("df.csv"))
 num_rows <- nrow(data) 
 data$x1 <- sample(seq(10000000, 99999999), num_rows)
 
 # Defining UI
 ui <- fluidPage(
-  
+  title = "Police Violence in Louisiana, By The Facts | ACLU of Louisiana",
   tags$head(
     
-    tags$meta(property = "og:title", content = "Police Quick Facts"),
+
+    tags$script(HTML("
+  document.addEventListener('DOMContentLoaded', function() {
+    var restContent = document.getElementById('restContent');
+    var mainScreen = document.getElementById('mainScreen');
+    var btn = document.getElementById('continueBtn');
+
+    if(restContent && mainScreen) {
+      // Set initial z-index and visibility
+      restContent.style.position = 'absolute';
+      restContent.style.top = 0;
+      restContent.style.left = 0;
+      restContent.style.width = '100%';
+      restContent.style.height = '100%';
+      restContent.style.zIndex = '1';
+      restContent.style.visibility = 'hidden';
+      restContent.style.opacity = 0;
+
+      mainScreen.style.position = 'relative';
+      mainScreen.style.zIndex = '2';
+      mainScreen.style.visibility = 'visible';
+      mainScreen.style.opacity = 1;
+      mainScreen.style.transition = 'opacity 0.5s ease';
+      mainScreen.style.transition = 'all 0.3s ease';
+    }
+
+    if(btn) {
+      btn.addEventListener('click', function() {
+        if(mainScreen && restContent) {
+          // Hide mainScreen
+          mainScreen.style.opacity = 0;
+          mainScreen.style.visibility = 'hidden';
+          mainScreen.style.zIndex = '1';
+
+          // Show restContent
+          restContent.style.visibility = 'visible';
+          restContent.style.opacity = 1;
+          restContent.style.zIndex = '2';
+          restContent.style.transition = 'all 0.5s ease';
+        }
+      });
+    }
+  });
+")),
+    
+   
+    
+    tags$link(rel = "shortcut icon", href = "https://www.laaclu.org//profiles/aclu_affiliates/themes/custom/affiliates/favicons/favicon.ico?v=3.0"),
+    
+    tags$meta(property = "og:title", content = "Police Violence in Louisiana, By The Facts | ACLU of Louisiana"),
     tags$meta(property = "og:description", content = "Ask, answer, and share questions about policing in Louisiana"),
     tags$meta(property = "og:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
     tags$meta(property = "og:url", content = "https://laaclu.shinyapps.io/quick-facts/"),
@@ -38,8 +76,7 @@ ui <- fluidPage(
     
     # Twitter Card meta tags
     tags$meta(name = "twitter:card", content = "summary"),
-    tags$meta(name = "twitter:site", content = "@elijah"),
-    tags$meta(name = "twitter:title", content = "Police Quick Facts for Data Science"),
+    tags$meta(name = "twitter:title", content = "Police Violence in Louisiana, By The Facts | ACLU of Louisiana"),
     tags$meta(name = "twitter:description", content = "Ask, answer, and share questions about policing in Louisiana"),
     tags$meta(name = "twitter:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
     tags$meta(name = "twitter:image:alt", content = "Cover"),
@@ -57,6 +94,10 @@ ui <- fluidPage(
       document.execCommand("copy");
       document.body.removeChild(textArea);
     }
+    
+    function escapeForJs(str) {
+  return JSON.stringify(str);
+}
     
       $(document).ready(function(){
         $("#help_button").click(function(){
@@ -84,8 +125,8 @@ ui <- fluidPage(
     downloadButton("downloadData", ""),
     div(class = "help-box-content",
         tags$p("Summary", style="font-size:30px; font-family: 'gtam2';"),
-        tags$p("This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personnel from 344 law 
-               enforcement agencies across Louisiana spanning 65 years, for a total of 119,717 quick facts. We created this project to make
+        tags$p("This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personnel from 330+ law 
+               enforcement agencies across Louisiana spanning 60+ years, for a total of 120,000+ quick facts. We created this project to make
                actionable insights easy to search, find, and share."),
         
         tags$br(),
@@ -173,20 +214,29 @@ ui <- fluidPage(
     font-weight: bold;
 }
 
+@font-face {
+    font-family: 'century';
+    src: url('https://static.aclu.org/fonts/CenturySchoolbook-Regular-webfont.woff') format('woff');
+}
+
 
 /* Importing fonts from Google */
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@200..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Roboto:wght@300..700&family=Open+Sans:wght@300..700&display=swap');
 
 /* Applying Sans-Serif to various objects defined below */
 .help-box, body, .rounded-box{
-    font-family: 'Roboto', 'Open Sans', sans-serif !important;
+    font-family: 'Roboto', 'Open Sans', sans-serif
+}
+
+.help-box, body, .rounded-box{
+    font-family: 'century'
 }
 
 /* Applying GT America to various objects defined below */
 .rank, .ribbon, .social-links a,.source-text {
     font-family: 'gtam' !important;
 }
-    
+
     
 /* Adding to the checkbox margin */
 #saved_checkboxes {
@@ -249,6 +299,7 @@ ui <- fluidPage(
   color: #FFFFFF; 
   transition: all 0.3s ease; 
   margin-bottom: 40px; 
+  font-family: 'century';
 }
 
 /* Hover effect for the boxes */
@@ -496,14 +547,16 @@ select:focus {
   font-weight: normal;
   transition: all 0.5s ease; 
   font-family: 'gtam2';
+  margin-top: 80px;
 }
 
 .how-use {
-  font-size: 20px; 
+  font-size: 25px; 
   font-style: italic; 
   color: #747474;
   font-weight: normal;
   font-family: 'gtam' !important;
+  background-color: white;
 }
 
 
@@ -592,6 +645,56 @@ select:focus {
 ")),
   # Defining the UI
   tags$div(
+    id = "mainScreen",
+    style = paste0(
+      "height: 100vh;",
+      "display: flex;",
+      "flex-direction: column;",
+      "justify-content: center;",
+      "align-items: center;",
+      "font-size: 50px;",
+      "font-weight: 700;",
+      "color: #0055AA;",
+      "text-align: center;",
+      "font-family: 'gtam2';",
+      "text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);",
+      "margin: 0;",
+      "background-image: url('https://aclujusticelab.org/wp-content/uploads/2020/12/HomePage_HeroTexture.png');",
+      "background-size: cover;",
+      "background-position: center;",
+      "background-repeat: no-repeat;"
+    ),
+    tags$h1(
+      "POLICE VIOLENCE IN LOUISIANA,",
+      style = "color: black; font-size: 56px; font-weight: 900; letter-spacing: 3px; margin-bottom: 12px;"
+    ),
+    tags$h2(
+      "BY THE FACTS",
+      style = "font-size: 40px; font-weight: 400; color: #0054AA; font-style: italic; margin-top: 0; margin-bottom: 30px; line-height: 1.2;"
+    ),
+    tags$button(
+      id = "continueBtn",
+      "Continue",
+      style = "margin-top: 30px; font-size: 20px; padding: 10px 30px; font-family: 'gtam2'; font-weight: 600; color: #fff; background-color: #0055AA; border: none; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 6px rgba(0, 85, 170, 0.5);"
+    ),
+    tags$div(
+      style = "position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;",
+      tags$a(
+        href = "https://aclujusticelab.org",
+        target = "_blank",  # optional, opens link in new tab
+        tags$img(
+          src = "https://aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png",
+          style = "height: 70px; width: auto; cursor: pointer;"
+        )
+      )
+    )
+  ),
+  tags$div(id = "restContent", 
+           style = "
+    background-color: white;
+    background-image: url('https://aclujusticelab.org/wp-content/uploads/2020/12/HomePage_HeroTexture.png');
+    background-repeat: repeat;
+  ",
     tags$br(),
     tags$div(
       tags$div(
@@ -634,17 +737,20 @@ select:focus {
         # Defining the save, random, and clear buttons   
         tags$div(
           class = "button-container",
-          actionButton("save_button", 
-                       HTML('<i class="fas fa-paper-plane"></i><span>Submit</span>'), 
-                       class = "normal-button normal-button-1"
+          actionButton("save_button",  
+                       HTML('<i class="fas fa-paper-plane"></i><span>Submit</span>'),  
+                       class = "normal-button normal-button-1",
+                       onclick = "document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true); setTimeout(() => document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false), 300);"
           ),
-          actionButton("random_button", 
+          actionButton("random_button",  
                        HTML('<i class="fas fa-dice"></i><span>Randomize</span>'),
-                       class = "normal-button normal-button-2"
+                       class = "normal-button normal-button-2",
+                       onclick = "document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true); setTimeout(() => document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false), 300);"
           ),
-          actionButton("clear_button", 
+          actionButton("clear_button",  
                        HTML('<i class="fa fa-trash"></i><span>Clear</span>'),
-                       class = "normal-button normal-button-3"
+                       class = "normal-button normal-button-3",
+                       onclick = "document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true); setTimeout(() => document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false), 300);"
           )
         ),
         
@@ -736,6 +842,7 @@ select:focus {
       font-size: 22px; 
       font-style: italic; 
       color: #747474;
+      background-color: white;
       font-weight: normal;
       font-family: 'gtam' !important;
     }
@@ -876,7 +983,7 @@ select:focus {
     },
     mouseout: function() {
       $(this).css({
-        'background-color': 'transparent',
+        'background-color': '#FFFFFF',
         'color': '',
         'transform': '',
         'transition': 'all 0.5s ease'
@@ -896,7 +1003,7 @@ select:focus {
     },
     mouseout: function() {
       $(this).css({
-        'background-color': 'transparent',
+        'background-color': '#FFFFFF',
         'color': '',
         'transform': '',
         'transition': 'all 0.5s ease',
@@ -1061,10 +1168,13 @@ server <- function(input, output, session) {
     saved_filters[[paste0(random_questions()$q1," ", random_questions()$q2, " in ",random_questions()$q3,"?")]] <- TRUE
   })
   
+  observeEvent(input$show_copy_notification, {
+    showNotification("Text Copied.", type = "message", duration = 3)
+  })
   
   # Defining the save button
   observeEvent(input$save_button, {
-
+    
     if (input$question1 == "All Questions" & 
         input$question2 == "All Agencies" &
         input$question3 == "All Years") {
@@ -1206,17 +1316,6 @@ server <- function(input, output, session) {
       }
     }
   })
-  
-  # # Display a random question/fact when the site is loaded without a query
-  # observe({
-  #   if (is.null(parseQueryString(session$clientData$url_search)$fact_id)) {
-  #     sample_questions <- sample(data$question_complex, 1)
-  #     for (question in sample_questions) {
-  #       saved_filters[[question]] <- TRUE
-  #     }
-  #   }
-  # })
-  
   
   
   # Creating the saved checkboxes based on the input
@@ -1371,8 +1470,8 @@ server <- function(input, output, session) {
         <a href="https://twitter.com/intent/post?url=https://laaclu.shinyapps.io/quick-facts/?fact_id=%s&text=%s (via @ACLUofLouisiana)" target="_blank" style="color: #FCAA17;">
           <i class="fab fa-twitter"></i>
         </a>
-        <a href="javascript:void(0);" onclick="copyToClipboard(\'%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/quick-facts/?fact_id=%s\')">
-          <i class="fas fa-copy"></i>
+        <a href="javascript:void(0);" onclick="copyToClipboard(`%s (via the ACLU of Louisiana) - https://laaclu.shinyapps.io/quick-facts/?fact_id=%s`); Shiny.setInputValue(`show_copy_notification`, Math.random());">        
+        <i class="fas fa-copy"></i>
         </a>
       </div>
       <div class="rank">%s <sup> %s </sup></div>
@@ -1392,4 +1491,6 @@ server <- function(input, output, session) {
   
   
 }
+
+# Running the shiny app
 shinyApp(ui = ui, server = server)
