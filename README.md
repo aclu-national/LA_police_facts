@@ -11,7 +11,14 @@ The data for this tool is sourced from:
 - [Mapping Police Violence](https://mappingpoliceviolence.org/)
 - [FBI Crime Explorer Law Enforcement Personnel Data](https://cde.ucr.cjis.gov/)
 
-# Git Structure
+## Replicating
+### Data
+
+### App
+
+
+
+## Git Structure
 
 - **`README.md`**: This file.
 - **`app_creation/`**: Contains the application files for creation.
