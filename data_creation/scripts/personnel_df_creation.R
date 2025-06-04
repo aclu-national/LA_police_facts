@@ -2,20 +2,67 @@
 
 # -----------------------------------------------------------------------
 # Author: Elijah Appelson
-# Update Date: October 3rd, 2024
+# Update Date: January 27th, 2025
 # -----------------------------------------------------------------------
 
 # Loading Libraries
-library(tidyverse)
+library(lubridate)
 library(janitor)
+library(zoo)
+library(tidyverse)
 
-# Loading data
-overview <- read_csv("data/overview_data/overview.csv")
-overview_cheat <- read_csv("data/overview_data/cheat_sheet_overview.csv")
+# Defining the data date
+newest_date <- "2025-01-27"
+
+# Defining Links
+pd_sizes_link = paste0("data/overview_data/", newest_date,"/lee_1960_2023.csv")
+agency_locations_link = "data/misconduct_data/data_agency-reference-list.csv"
+pd_references_link = "data/overview_data/35158-0001-Data.rda"
+
+# Reading in data
+pd_sizes <- read_csv(here::here(pd_sizes_link))
+agency_locations <- read_csv(here::here(agency_locations_link))
+
+# Loading in data
+load(here::here(pd_references_link))
+
+pd_references <- da35158.0001
+
+# ------------------------------------- Cleaning Data Process ----------------------------------------------
+
+# Renaming variables in the pd references
+pd_references <- pd_references %>%
+  select(ORI9, NAME) %>%
+  rename(ori = ORI9,
+         agency_full_name = NAME)
+
+
+# Defining the type of agency
+agency_locations <- agency_locations %>%
+  filter(!(agency_slug %in% c("de-soto-so", "new-orleans-so"))) %>%
+  mutate(
+    agency_type = case_when(
+      str_detect(tolower(agency_name), "university|college|campus") ~ "University or Campus Police",
+      str_detect(tolower(agency_name), "marshal") ~ "Marshal's Office",
+      str_detect(tolower(agency_name), "constable") ~ "Constable's Office",
+      str_detect(tolower(agency_name), "sheriff") ~ "Sheriff's Office",
+      str_detect(tolower(agency_name), "department|police department") ~ "Police Department",
+      TRUE ~ "Other Law Enforcement Agency"
+    ))
+
+# Connecting department references with police department sizes
+la_pd_sizes <- pd_sizes %>% 
+  filter(state_abbr == "LA") %>%
+  left_join(pd_references, by = "ori") %>%
+  mutate(agency_name = str_trim(str_to_title(agency_full_name)),
+         agency_name = ifelse(is.na(agency_name), pub_agency_name, agency_name),
+         agency_name = str_replace(agency_name, "Dept|Dept.|Pd", "Police Department"),
+         agency_name = str_remove(agency_name, "\\.$"))
+
 
 
 # Defining overview_better
-overview_better <- overview %>%
+overview_better <- la_pd_sizes %>%
   left_join(overview_cheat, by = "agency_name")
 
 # Creating a total dataframe of personel
