@@ -1,5 +1,16 @@
 ![alt text](https://github.com/aclu-national/louisiana_police_quick_facts/blob/5a3a7304842ee61510c4678ce136f67ec83f2ebb/image_facts.png)
 
+## Summary
+This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personnel from 330+ law enforcement agencies across Louisiana spanning 60+ years, for a total of 120,000+ quick facts. We created this project to make actionable insights easy to search, find, and share.
+
+
+## Sources
+
+The data for this tool is sourced from:
+- [Louisiana Law Enforcement and Accountability Database](llead.co)
+- [Mapping Police Violence](https://mappingpoliceviolence.org/)
+- [FBI Crime Explorer Law Enforcement Personnel Data](https://cde.ucr.cjis.gov/)
+
 # Git Structure
 
 - **`README.md`**: This file.
@@ -29,18 +40,10 @@
     - `misconduct_df_creation.R`: Script for creating misconduct data dataframe.
     - `personnel_df_creation.R`: Script for creating personnel data dataframe.
 
-## Purpose
-This project provides essential information about policing in Louisiana, aiming to offer valuable insights and data to users.
-
-## Sources
-The data for this tool is sourced from:
-- [Louisiana Law Enforcement and Accountability Database](llead.co) (January 2024)
-- [Mapping Police Violence](https://mappingpoliceviolence.org/) (March 2024)
-- [FBI Crime Explorer Law Enforcement Personnel Data](https://cde.ucr.cjis.gov/) (January 2024)
 
 ## Disclaimer
-The information presented by this tool is derived from publicly available resources. We cannot guarantee the accuracy or completeness of the data provided.
+All of the information accessible from this tool is generated using publicly accessible resources. As a result, we cannot verify the accuracy of any of the numbers generated.
 
 ## Questions
-For any inquiries or concerns regarding this tool, please contact us at [eappelson@laaclu.org](mailto:eappelson@laaclu.org).
+If you have any questions or concerns about the content of this tool, you can contact [eappelson@laaclu.org](mailto:eappelson@laaclu.org).
 
