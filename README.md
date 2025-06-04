@@ -15,7 +15,7 @@ The data for this tool is sourced from:
 ### 1. Clone
 Clone the repository to your local machine:
 ```bash
-git clone https://github.com/aclu-national/louisiana_police_quick_facts
+git clone https://github.com/aclu-national/LA_police_facts
 ```
 ### 2. Data 
 Run `data_creation_master_script.R`. This should download `df.csv` inside the app creation folder.
