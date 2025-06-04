@@ -13,6 +13,11 @@ The data for this tool is sourced from:
 
 ## Replicating
 ### 1. Clone
+Clone the repository to your local machine:
+```bash
+git clone https://github.com/yourusername/tracking-287g.git
+```
+
 ### 2. Data 
 ### 3. App
 
