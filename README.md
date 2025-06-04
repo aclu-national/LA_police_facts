@@ -12,9 +12,9 @@ The data for this tool is sourced from:
 - [FBI Crime Explorer Law Enforcement Personnel Data](https://cde.ucr.cjis.gov/)
 
 ## Replicating
-### Data
-
-### App
+### 1. Clone
+### 2. Data 
+### 3. App
 
 
 
