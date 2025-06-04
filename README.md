@@ -1,6 +1,6 @@
- # Police Quick Facts
+ # Police Violence in Louisiana, By the Facts
 
-![alt text](https://github.com/aclu-national/louisiana_police_quick_facts/blob/80d4c708379a125cce253c7c782504e85c067821/app_preview.png)
+![alt text](https://github.com/aclu-national/louisiana_police_quick_facts/blob/5a3a7304842ee61510c4678ce136f67ec83f2ebb/image_facts.png)
 
 # Git Structure
 
