@@ -26,6 +26,64 @@ Run `app.R`. This should create the tool.
 
 ## Git Structure
 
+
+```
+LA_police_facts
+├── README.md
+├── app_creation
+│   ├── LA_police_facts_app.Rproj
+│   ├── app.R
+│   ├── df.csv
+│   └── rsconnect
+│       └── shinyapps.io
+│           └── laaclu
+│               └── test2.dcf
+├── data_creation
+│   ├── data
+│   │   ├── killing_data
+│   │   │   ├── 2024-01-11
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2024-03-01
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2024-03-25
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2024-09-05
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2024-11-18
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2025-01-27
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2025-02-26
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2025-03-26
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2025-05-07
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   ├── 2025-07-03
+│   │   │   │   └── Mapping Police Violence.csv
+│   │   │   └── cheat_sheet_killing.csv
+│   │   ├── misconduct_data
+│   │   │   ├── data_agency-reference-list.csv
+│   │   │   ├── data_event.csv
+│   │   │   └── misconduct.csv
+│   │   └── overview_data
+│   │       ├── 2024-02-27
+│   │       │   └── pe_1960_2022.csv
+│   │       ├── 2025-01-27
+│   │       │   └── lee_1960_2023.csv
+│   │       ├── 35158-0001-Codebook.pdf
+│   │       ├── 35158-0001-Data.rda
+│   │       └── cheat_sheet_overview.csv
+│   ├── data_creation_master_script.R
+│   ├── quick_fact_data_creation.Rproj
+│   └── scripts
+│       ├── killing_df_creation.R
+│       ├── misconduct_df_creation.R
+│       └── personnel_df_creation.R
+└── image_facts.png
+
+```
+
 - **`README.md`**: This file.
 - **`app_creation/`**: Contains the application files for creation.
   - `app.R`: The main R script for the application.
