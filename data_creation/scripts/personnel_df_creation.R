@@ -18,10 +18,12 @@ newest_date <- "2025-01-27"
 pd_sizes_link = paste0("data/overview_data/", newest_date,"/lee_1960_2023.csv")
 agency_locations_link = "data/misconduct_data/data_agency-reference-list.csv"
 pd_references_link = "data/overview_data/35158-0001-Data.rda"
+overview_cheat = "data/overview_data/cheat_sheet_overview.csv"
 
 # Reading in data
 pd_sizes <- read_csv(here::here(pd_sizes_link))
 agency_locations <- read_csv(here::here(agency_locations_link))
+overview_cheat <- read_csv(here::here(overview_cheat))
 
 # Loading in data
 load(here::here(pd_references_link))
