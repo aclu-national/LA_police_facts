@@ -22,7 +22,7 @@ git clone https://github.com/aclu-national/LA_police_facts
 Open the `data_creation.Rproj` project and run `master_script.R`. This should download `df.csv` inside the `app_creation` folder.
 
 ### 3. App
-Run `app.R`. This should create the tool. 
+Open the `app_creation.Rproj` project and run `app.R`. This should create the tool. 
 
 
 ## Git Structure
