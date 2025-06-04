@@ -17,8 +17,9 @@ Clone the repository to your local machine:
 ```bash
 git clone https://github.com/aclu-national/louisiana_police_quick_facts
 ```
-
 ### 2. Data 
+Run `data_creation_master_script.R`. This should download `df.csv` inside the app creation folder.
+
 ### 3. App
 
 
