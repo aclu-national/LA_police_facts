@@ -21,7 +21,7 @@ git clone https://github.com/aclu-national/louisiana_police_quick_facts
 Run `data_creation_master_script.R`. This should download `df.csv` inside the app creation folder.
 
 ### 3. App
-
+Run `app.R`. This should create the tool. 
 
 
 ## Git Structure
