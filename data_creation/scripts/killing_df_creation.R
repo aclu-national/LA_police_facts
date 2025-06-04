@@ -2,7 +2,7 @@
 
 # -----------------------------------------------------------------------
 # Author: Elijah Appelson
-# Update Date: October 3rd, 2024
+# Update Date: January 27th, 2025
 # -----------------------------------------------------------------------
 
 
@@ -10,12 +10,52 @@
 library(tidyverse)
 library(janitor)
 
+# Defining the data date
+newest_date <- "2025-07-03"
+
 # Importing Data
 killing_cheat <- read_csv("data/killing_data/cheat_sheet_killing.csv")
-killing_data <- read_csv("data/killing_data/killing.csv")
+killing_data <- read_csv(paste0("data/killing_data/", newest_date ,"/Mapping Police Violence.csv"))
+
 
 # Defining a killing dataframe
 killing <- killing_data %>%
+  
+  # Cleaning names
+  clean_names() %>%
+  
+  # Filtering for Louisiana killings
+  filter(state == "Louisiana") %>%
+  
+  # Separating Parish from Parish names
+  separate_wider_delim(county, delim = " Parish", names = c("parish", "extra"), too_few = "align_start") %>%
+  
+  # Removing "extra" column
+  select(-extra) %>%
+  
+  # Fixing demographic variables
+  mutate(race = ifelse(is.na(race), "Unknown Race", race),
+         race = ifelse(race == "Unknown race", "Unknown Race", race),
+         gender = ifelse(is.na(gender), "Unknown Gender", gender),
+         age = ifelse(is.na(age), "Unknown Age", age),
+         
+         # Fixing and defining year and month variables
+         date = mdy(date),
+         year = year(date),
+         year_month = month(date),
+         
+         # Creating an age category
+         age_category = case_when(
+           age < 18 ~ "<18",
+           age >= 18 & age < 35 ~ "18 - 34",
+           age >= 35 & age < 55 ~ "35 - 54",
+           age >= 55 ~ "55+",
+           TRUE ~ NA),
+         parish = ifelse(parish == "Dallas", "Rapides", parish),
+         parish = str_replace(parish, "Saint", "St."),
+         parish = ifelse(parish == "Acadiana", "Acadia", parish),
+         parish = ifelse(city == "Monroe", "St. Tammany", parish)) %>%
+  filter(!(name == "Omarr Jackson" & race == "White")) %>%
   mutate(
     
     # Fixing the agencies spelling
@@ -66,6 +106,7 @@ killing <- killing_data %>%
             agency_name = paste(agency_name, collapse = ", "),
             correct_agency_name = paste(correct_agency_name, collapse = ", ")
   )
+
 
 # Defining the appropriate columns
 killing_func <- function(df){
@@ -135,7 +176,7 @@ all_year_killing <- killing %>%
   unnest(correct_agency_name) %>%
   group_by(correct_agency_name) %>%
   killing_func() %>%
-  mutate(year = "2013-2024") %>%
+  mutate(year = "2013-2025") %>%
   mutate(year = as.character(year),
          years_report = "Total Years Collecting Police Killings") %>%
   distinct(,.keep_all = TRUE)
