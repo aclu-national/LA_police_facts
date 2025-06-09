@@ -6,111 +6,917 @@ library(bslib)
 library(janitor)
 library(metathis)
 
+# Setting the seed
 set.seed(1)
 
-# Importing and defining data
+# Importing the data
 data <- read_csv(here::here("df.csv"))
-num_rows <- nrow(data) 
-data$x1 <- sample(seq(10000000, 99999999), num_rows)
 
-# Defining UI
+# Adding a unique identifier for each row
+data$x1 <- sample(seq(10000000, 99999999), nrow(data))
+
+# Defining the UI
 ui <- fluidPage(
+  
+  # Title that appears on the Tab
   title = "Police Violence in Louisiana, By The Facts | ACLU of Louisiana",
+  
+
+  # Defining the head
   tags$head(
     
 
-    tags$script(HTML("
-  document.addEventListener('DOMContentLoaded', function() {
-    var restContent = document.getElementById('restContent');
-    var mainScreen = document.getElementById('mainScreen');
-    var btn = document.getElementById('continueBtn');
-
-    if(restContent && mainScreen) {
-      // Set initial z-index and visibility
-      restContent.style.position = 'absolute';
-      restContent.style.top = 0;
-      restContent.style.left = 0;
-      restContent.style.width = '100%';
-      restContent.style.height = '100%';
-      restContent.style.zIndex = '1';
-      restContent.style.visibility = 'hidden';
-      restContent.style.opacity = 0;
-
-      mainScreen.style.position = 'relative';
-      mainScreen.style.zIndex = '2';
-      mainScreen.style.visibility = 'visible';
-      mainScreen.style.opacity = 1;
-      mainScreen.style.transition = 'opacity 0.5s ease';
-      mainScreen.style.transition = 'all 0.3s ease';
-    }
-
-    if(btn) {
-      btn.addEventListener('click', function() {
-        if(mainScreen && restContent) {
-          // Hide mainScreen
-          mainScreen.style.opacity = 0;
-          mainScreen.style.visibility = 'hidden';
-          mainScreen.style.zIndex = '1';
-
-          // Show restContent
-          restContent.style.visibility = 'visible';
-          restContent.style.opacity = 1;
-          restContent.style.zIndex = '2';
-          restContent.style.transition = 'all 0.5s ease';
-        }
-      });
-    }
-  });
-")),
-    
-   
-    
-    tags$link(rel = "shortcut icon", href = "https://www.laaclu.org//profiles/aclu_affiliates/themes/custom/affiliates/favicons/favicon.ico?v=3.0"),
-    
+    # Creating website Metadata
+    tags$link(rel = "shortcut icon", href = "https://www.laaclu.org/profiles/aclu_affiliates/themes/custom/affiliates/favicons/favicon.ico?v=3.0"),
     tags$meta(property = "og:title", content = "Police Violence in Louisiana, By The Facts | ACLU of Louisiana"),
     tags$meta(property = "og:description", content = "Ask, answer, and share questions about policing in Louisiana"),
     tags$meta(property = "og:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
     tags$meta(property = "og:url", content = "https://laaclu.shinyapps.io/quick-facts/"),
     tags$meta(property = "og:type", content = "website"),
     tags$meta(property = "og:author", content = "Elijah Appelson"),
-    
-    # Twitter Card meta tags
     tags$meta(name = "twitter:card", content = "summary"),
     tags$meta(name = "twitter:title", content = "Police Violence in Louisiana, By The Facts | ACLU of Louisiana"),
     tags$meta(name = "twitter:description", content = "Ask, answer, and share questions about policing in Louisiana"),
     tags$meta(name = "twitter:image", content = "https://www.aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png"),
-    tags$meta(name = "twitter:image:alt", content = "Cover"),
     
-    # Importing social media buttons
-    tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
-    # Defining Help Button visibility
-    tags$script(HTML('
-    
+
+# ------------------------- Defining the JavaScript ----------------------------
+
+# JavaScript
+tags$script(
+  HTML("
+    document.addEventListener('DOMContentLoaded', function() {
+      const restContent = document.getElementById('restContent');
+      const mainScreen = document.getElementById('mainScreen');
+      const btn = document.getElementById('continueBtn');
+
+      if (restContent && mainScreen) {
+        Object.assign(restContent.style, {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: '1',
+          visibility: 'hidden',
+          opacity: 0
+        });
+
+        Object.assign(mainScreen.style, {
+          position: 'relative',
+          zIndex: '2',
+          visibility: 'visible',
+          opacity: 1,
+          transition: 'all 0.3s ease'
+        });
+      }
+
+      if (btn) {
+        btn.addEventListener('click', function() {
+          if (mainScreen && restContent) {
+            Object.assign(mainScreen.style, {
+              opacity: 0,
+              visibility: 'hidden',
+              zIndex: '1'
+            });
+
+            Object.assign(restContent.style, {
+              visibility: 'visible',
+              opacity: 1,
+              zIndex: '2',
+              transition: 'all 0.5s ease'
+            });
+          }
+        });
+      }
+    });
+
     function copyToClipboard(text) {
-      var textArea = document.createElement("textarea");
+      const textArea = document.createElement('textarea');
       textArea.value = text;
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand("copy");
+      document.execCommand('copy');
       document.body.removeChild(textArea);
     }
-    
-    function escapeForJs(str) {
-  return JSON.stringify(str);
-}
-    
-      $(document).ready(function(){
-        $("#help_button").click(function(){
-          $(".help-box").toggleClass("visible");
-        });
+
+    function disableButtonsTemporarily() {
+      document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true);
+      setTimeout(() => {
+        document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false);
+      }, 300);
+    }
+
+    $(document).ready(function() {
+      $('#help_button').click(function() {
+        $('.help-box').toggleClass('visible');
       });
+
+      $('#question1, #question2, #question3').select2({
+        placeholder: 'Search for a question',
+        width: 'auto'
+      }).on('select2:open', function() {
+        $(this).data('select2').$dropdown.addClass('select2-dropdown');
+      });
+
+      $('#sort, #group').select2({
+        placeholder: 'Search for a question',
+        width: 'auto',
+        minimumResultsForSearch: Infinity
+      }).on('select2:open', function() {
+        $(this).data('select2').$dropdown.addClass('select2-dropdown');
+      });
+
+      $('#question1, #question2, #question3').parent().find('span.select2-selection').hover(
+        function() {
+          $(this).css({
+            'background-color': '#FEF98B',
+            'color': 'black',
+            'transform': 'scale(1.02)',
+            'transition': 'all 0.5s ease'
+          });
+        },
+        function() {
+          $(this).css({
+            'background-color': '#FFFFFF',
+            'color': '',
+            'transform': '',
+            'transition': 'all 0.5s ease'
+          });
+        }
+      );
+
+      $('#sort, #group').parent().find('span.select2-selection').hover(
+        function() {
+          $(this).css({
+            'background-color': '#FEF98B',
+            'color': 'black',
+            'transform': 'scale(1.05)',
+            'transition': 'all 0.5s ease',
+            'margin-bottom': '-5px'
+          });
+        },
+        function() {
+          $(this).css({
+            'background-color': '#FFFFFF',
+            'color': '',
+            'transform': '',
+            'transition': 'all 0.5s ease',
+            'margin-bottom': '-5px'
+          });
+        }
+      );
+    });
+  ")
+)),
+
+
+# ----------------------------- Adding the CSS ---------------------------------
+
+# Adding the social media buttons
+tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"),
+tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"),
+tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"),
+
+# Defining the website style
+tags$style(
+  HTML(
+  "
+  /* Creating the download data*/
+  #downloadData {
+          display: block;
+    margin: 0 auto;
+    margin-top: 0px;
+    width: 50%;
+    padding: 10px;
+    margin-bottom: 0px;
+      background-color: #0055AA;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      border-radius: 15px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+  }
       
-      $(document).ready(function() {
-        $(".btn").on("click", function(){$(this).blur()});
-      })
-    '))
-  ),
-  # Defining Help Button
+  /* Creating a download data button style*/
+  #downloadData:active  {
+      background-color: #ADD8E6;
+      box-shadow: inset 0 0 4px 4px rgba(173, 216, 230, 1)
+  }
+      
+  /* Importing GT America font compressed regular */
+  @font-face {
+      font-family: 'gtam';
+      src: url('https://static.aclu.org/fonts/GT-America-Compressed-Regular.woff2') format('woff2');
+      font-weight: bold;
+  }
+  
+  /* Importing GT America font compressed bold */
+  @font-face {
+      font-family: 'gtam2';
+      src: url('https://static.aclu.org/fonts/GT-America-Compressed-Bold.woff2') format('woff2');
+      font-weight: bold;
+  }
+  
+  /* Importing Century regular font */
+  @font-face {
+      font-family: 'century';
+      src: url('https://static.aclu.org/fonts/CenturySchoolbook-Regular-webfont.woff') format('woff');
+  }
+  
+  /* Applying Century font */
+  .help-box, body, .rounded-box{
+      font-family: 'century'
+  }
+  
+  /* Applying GT America font */
+  .ribbon, .social-links a,.source-text {
+      font-family: 'gtam' !important;
+  }
+  
+  /* Adding checkbox margin */
+  #saved_checkboxes {
+      margin-top: 20px;
+  }
+  
+  /* Defining the ribbon at the top of the boxes */
+  .ribbon {
+    position: relative;
+    top: -40px; 
+    left: 50%; 
+    width: 400px;
+    transform: translateX(-50%);
+    text-align: center; 
+    background-color: #FCAA17; 
+    border-top-left-radius: 25px; 
+    border-top-right-radius: 25px;
+    color: #FFFFFF; 
+    font-weight: bold;
+    padding: 10px; 
+    z-index: 1;
+    font-size: 25px;
+    transition: all 0.3s ease; 
+  }
+  
+  
+  /* Ribbon color for misconduct */
+  .ribbon-misconduct {
+    background-color: #ef404e;
+  }
+  
+  /* Ribbon color for police killing */
+  .ribbon-killing {
+    background-color: #130f54;
+  }
+  
+  /* Ribbon color for personnel */
+  .ribbon-personnel {
+    background-color: #fcaa17; 
+  }
+  
+  /* Defining the rounded answer box */
+  .rounded-box {
+    position: relative; 
+    z-index: 1;
+    background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTL2zA7fqOjSwqidu1i05tM5sSZjVIbAlSDpXtHX0I0g&s'), linear-gradient(to bottom right, #0055AA, #0055AA);
+    background-size: 70px auto, cover;
+    background-position: right bottom, center;
+    background-repeat: no-repeat;
+    border-radius: 25px; 
+    padding: 40px 40px 40px; 
+    width: 400px; 
+    font-size: 25px;
+    text-align: left;
+    font-weight: normal;
+    margin: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    color: #FFFFFF; 
+    transition: all 0.3s ease; 
+    margin-bottom: 40px; 
+    font-family: 'century';
+  }
+  
+  /* Hover effect for the boxes */
+  .rounded-box:hover {
+    transform: scale(1.10);
+    box-shadow: 0px 0px 16px  #FEF98B; 
+    transition: all 0.5s ease; 
+    filter: brightness(115%);
+  }
+  
+  /* Shiny notification styling */
+  .shiny-notification {
+      background-color: #FCAA17; 
+      font-family: 'gtam';
+      color: white; 
+      border-radius: 5px;
+      padding: 10px; 
+      font-size: 25px; 
+      z-index: 9999;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+      border: none;
+      opacity: 0.90;
+  
+  }
+  
+  /* Common button styling */
+  .normal-button-1,
+  .normal-button-2,
+  .normal-button-3 {
+    font-size: 30px;
+    margin-top: -10px;
+    border-width: 0;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  /* Save button styling */
+  .normal-button-1 {
+    font-weight: bold;
+    color: #025800;
+  }
+  
+  /* Save button styling when hovering */
+  .normal-button-1:hover {
+    color: #012101;
+    background-color: transparent;
+    transform: scale(1.2);
+    transition: all 0.5s ease;
+  }
+  
+  /* Random button styling */
+  .normal-button-2 {
+    color: #0055AA;
+  }
+  
+  /* Random button styling when hovering */
+  .normal-button-2:hover {
+    color: #001326;
+    background-color: transparent;
+    transform: scale(1.2);
+    transition: all 0.5s ease;
+  }
+  
+  /* Clear button styling */
+  .normal-button-3 {
+    color: #ef404e;
+  }
+  
+  /* Clear button styling when hovering */
+  .normal-button-3:hover {
+    color: #260204;
+    background-color: transparent;
+    transform: scale(1.2);
+    transition: all 0.5s ease;
+  }
+  
+  /* Social media links */
+  .social-links {
+    position: absolute;
+    top: 45%;
+    right: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    color: #FCAA17;
+  }
+  
+  /* Individual social media link */
+  .social-links a {
+    color: #FCAA17; 
+  }
+  
+  /* Individual social link when hovering */
+  .social-links a:hover {
+    color: #FED07E;
+    transform: scale(1.25);
+    transition: all 0.5s ease; 
+  }
+  
+  /* Defining source-text */
+  .source-text {
+    color: #FCAA17; 
+    font-size: 16px;
+    font-style: italic;
+    padding-right: 20px;
+  }
+  
+  /* Defining source-text when hovering */
+  .source-text:hover {
+    color: #FEC051; 
+  }
+  
+  /* Defining the inner box around the checkbox */
+  .inner-box {
+    background-color: white; 
+    padding-bottom: 0px; 
+    padding-left: 10px; 
+    padding-right: 10px;
+    border-radius: 20px;
+    font-size:25px;
+    font-family: 'gtam', sans-serif;
+  }
+  
+  /* Defining the outer box around the checkbox */
+  .outer-box {
+    background-color: #fcaa17;
+    text-align: left; 
+    border-radius: 20px; 
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+    margin-top: 20px;
+    padding-bottom: 0px;
+    font-family: 'gtam', sans-serif;
+  }
+  
+  /* Defining the output box container */
+  .column-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  /* Removing the border around selected choices */
+  select:focus {
+    outline: none; 
+  }
+  
+  /* Fixing the checkbox display */
+  .custom-checkbox-group .shiny-input-container {
+      display: flex;
+      flex-direction: column;
+  }
+  
+  /* Centering checkbox display */
+  .custom-checkbox-group .shiny-input-container .checkbox label {
+      display: flex;
+      align-items: center;
+  }
+  
+  /* Moving the checkbox */
+  .custom-checkbox-group .shiny-input-container .checkbox label input[type='checkbox'] {
+      margin-right: 5px;
+  }
+  
+  /* Styling of help-button*/
+  .help-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 70px; 
+      height: 70px;
+      background-color: #ef404e;
+      color: white;
+      border-style: solid;
+      border-width: 0px;
+      border-color: #ffffff;
+      border-radius: 50%; 
+      padding: 15px;
+      font-size: 30px;
+      box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      z-index: 3000;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Styling the help button box */
+  .help-box {
+      position: fixed;
+      width: 35%;
+      height: 85%;
+      bottom: 60px; 
+      right: 60px; 
+      background-color: #F5F5F5;
+      color: #000000;
+      border-radius: 10px;
+      box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 2000;
+      font-size: 16px;
+      overflow-y: scroll;
+  }
+      
+  /* Defining the hover effect for the help button */
+  .help-button:hover {
+      transform: scale(1.10);
+      box-shadow: 0px 0px 16px  #FEF98B; 
+      transition: all 0.5s ease; 
+      filter: brightness(115%);
+  }
+  
+  /* Creating a visibility variable to be used for the help button */
+  .visible {
+      visibility: visible;
+      opacity: 1;
+  }
+   
+  /* Adding padding to the content of the help box */
+  .help-box-content {
+    padding: 20px; 
+  }
+  
+  /* Creating styling for the questions at the top of the page */
+  .question-content {
+    text-align: center; 
+    font-size: 35px;
+    font-weight: normal;
+    transition: all 0.5s ease; 
+    font-family: 'gtam2';
+    margin-top: 80px;
+    color: black;
+  }
+  
+  /* Creating styling for the description below the questions at the top of the page */
+  .how-use {
+    font-size: 25px; 
+    font-style: italic; 
+    color: #747474;
+    font-weight: normal;
+    font-family: 'gtam' !important;
+    background-color: white;
+  }
+  
+  /* Creating styling for the model when an error occurs */
+  .modal-title {
+           font-family: 'gtam2';
+          font-size: 35px;
+          color: #0055AA;
+          text-align: center;
+          font-weight: bold;
+  }
+      
+  /* Creating styling for the model text when an error occurs */
+  .modal-body {
+          font-family: 'century';
+          font-size: 16px;
+  }
+  
+  /* Creating a container to organize the save, random, and clear buttons */
+  .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+  }
+
+  /* Adding text underneith save, random, and clear buttons */
+  .normal-button {
+      font-size: 30px;
+      background-color: transparent;
+      border-width: 0px;
+      font-weight: bold;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  
+  /* Making the save, random, and clear button icons larger */
+  .normal-button .fa {
+      font-size: 30px;
+  }
+  
+  /* Defining the the save, random, and clear button font */
+  .normal-button span {
+      font-size: 18px; 
+      margin-top: 5px;
+      display: block;
+  }
+  
+  /* Downloader in help-box */
+  .help-box-downloader {
+      font-size:30px; 
+      font-family: 'gtam2
+  }
+  
+  /* Help box titles */
+  .help-box-titles {
+      font-size:30px; 
+      font-family: 'gtam2';
+  }
+  
+  /* Help box subtitles */
+  .help-box-subtitles {
+      font-size:20px; 
+      font-family: 'gtam2';
+  }
+  
+  /* Intro screen styling */
+  .intro-screen {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 50px;
+      font-weight: 700;
+      color: #0055AA;
+      text-align: center;
+      font-family: 'gtam2';
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      margin: 0;
+      background-image: url('https://aclujusticelab.org/wp-content/uploads/2020/12/HomePage_HeroTexture.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+  }
+  
+  /* Intro screen title styling */
+  .intro-screen-title {
+      color: black; 
+      font-size: 56px; 
+      font-weight: 900; 
+      letter-spacing: 3px; 
+      margin-bottom: 12px;
+  }
+  
+  /* Intro screen subtitle styling */
+  .intro-screen-subtitle {
+      font-size: 40px; 
+      font-weight: 400; 
+      color: #0054AA; 
+      font-style: italic; 
+      margin-top: 0; 
+      margin-bottom: 30px; 
+      line-height: 1.2;
+  }
+  
+  /* Intro screen continue button */
+  .intro-screen-button {
+      margin-top: 30px; 
+      font-size: 20px; 
+      padding: 10px 30px; 
+      font-family: 'gtam2'; 
+      font-weight: 600; 
+      color: #fff; 
+      background-color: #0055AA; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      box-shadow: 2px 2px 6px rgba(0, 85, 170, 0.5);
+  }
+  
+  /* Intro screen link container */
+  .intro-screen-link-container {
+      position: fixed; 
+      bottom: 20px; 
+      left: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: flex-end; 
+      gap: 10px;
+  }
+  
+  /* Intro screen link */
+  .intro-screen-link {
+      height: 70px; 
+      width: auto; 
+      cursor: pointer;
+  }
+  
+  /* Main screen styling */
+  .main-page {
+      background-color: white;
+      background-image: url('https://aclujusticelab.org/wp-content/uploads/2020/12/HomePage_HeroTexture.png');
+      background-repeat: repeat;
+  }
+
+  /* Defining Select2 styling */
+  .select2-container--default .select2-selection--single {
+      border: none !important;
+      margin-top: -10px; 
+      height: auto;
+      line-height: 2.5;
+      background-color: white;
+  }
+  
+  /* Defining Select2 container */
+  .select2-container--default .select2-selection--single .select2-selection__rendered {
+      line-height: 1.6; 
+      color: black;
+      border-radius: 20px;
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-decoration-color: #FCAA17;
+      text-decoration-size: 30px;
+  }
+    
+  /* Defining Select2 dropdown */
+  .select2-dropdown {
+      border: none !important;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.5); 
+      font-size: 18px;
+  }
+  
+  /* Changing Select2 arrow */
+  .select2-selection__arrow {
+      transform: scale(1.5) !important;
+  }
+  
+  /* Sort-by styling */
+  .sort-by {
+      font-size: 25px; 
+      font-weight: normal;
+      font-family: 'gtam';
+      top: -50px;
+  }
+  
+  /* Sort-by box styling */
+  .sort-by-box {
+      font-size: 27px;
+      background-color: white; 
+      padding: 20px; 
+      border-radius: 20px;
+      font-family: 'gtam'
+  }
+  
+## ---------------------------- Screen Size Styling ----------------------------
+
+  /* Sidepanel change */
+  @media only screen and (max-width: 786px) {
+    .sidebarPanel {
+      border: 1px solid black;
+      border-radius: 30px;
+      padding: 10px;
+      border-width: 0px;
+    }
+  }
+  
+  /* Select2 max width*/
+  @media screen and (min-width: 787px) {
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      max-width: 600px;
+    }
+  }
+  
+  /* Defining rounded-box width and the ACLU symbol based on the screen size */
+  @media only screen and (max-width: 450px) {
+    .rounded-box {
+      width: calc(100% - 40px); 
+      background-size: 70px auto, cover;
+    }
+  }
+
+  @media only screen and (min-width: 451px) {
+    .rounded-box {
+      width: calc(100% - 40px); 
+      background-size: 70px auto, cover;
+    }
+  }
+
+  @media only screen and (min-width: 1001px) {
+    .rounded-box {
+      width: calc(50% - 40px); 
+      background-size: 70px auto, cover;
+    }
+  }
+  
+  @media only screen and (min-width: 1400px) {
+    .rounded-box {
+        background-size: 70px auto, cover;
+    }
+  }
+  
+  @media only screen and (min-width: 1600px) {
+    .rounded-box {
+      width: calc(33.3333% - 40px);
+    }
+  }
+
+  /* Defining ribbon width based on the screen size */
+  @media only screen and (max-width: 600px) {
+    .ribbon {
+      width: calc(100% + 80px); 
+    }
+  }
+  
+  @media only screen and (min-width: 601px) {
+    .ribbon {
+      width: calc(100% + 80px);
+    }
+  }
+  
+  @media only screen and (min-width: 1200px) {
+    .ribbon {
+      width: calc(100% + 80px);
+    }
+  }
+    
+  /* Defining the select2 width based on the screen size */
+  @media screen and (max-width: 786px) {
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+      max-width: 350px;
+    }
+  }
+  
+  /* Defining phone styling */
+  @media screen and (max-width: 450px) {
+  
+    /* How to use */
+    .how-use {
+        font-size: 22px; 
+        font-style: italic; 
+        color: #747474;
+        background-color: white;
+        font-weight: normal;
+        font-family: 'gtam' !important;
+    }
+      
+    /* Question content */
+    .question-content {
+        text-align: center; 
+        font-size: 30px;
+        font-weight: bold;
+        transition: all 0.5s ease; 
+        font-family: 'gtam2';
+        color: black;
+    }
+      
+    /* Ribbon */
+    .ribbon {
+        font-size: 22px;
+        transition: all 0.3s ease; 
+        font-style: italic;
+    }
+  
+    
+    /* Rounded box hovering */
+     .rounded-box:hover {
+      transform: scale(1);
+      box-shadow: 0px; 
+      transition: all 0.5s ease; 
+      filter: brightness(100%);
+     }
+     
+     /* Help box */
+    .help-box {
+          bottom: 60px; 
+          right: 20px;
+          width: 90%; 
+    }
+    
+    /* Save, Random, and Clear buttons */
+    .normal-button-1:hover {
+      transform: scale(1); 
+      transition: none;
+    }
+    .normal-button-2:hover {
+      transform: scale(1); 
+      transition: none;
+    }
+    .normal-button-3:hover {
+      transform: scale(1); 
+      transition: none;
+    }
+    
+    /* Social links */
+    .social-links {
+      top: 50%;
+    }
+    
+    /* Removing sort and group */
+    #sort_group_wrapper {
+          display: none;
+    }
+      
+    /* Changing the inner box */
+    .inner-box {
+      background-color: white; 
+      padding-bottom: 10px; 
+      padding-top: 10px; 
+      padding-left: 10px; 
+      padding-right: 10px;
+      border-radius: 20px;
+      font-size:25px;
+      font-family: 'gtam', sans-serif;
+    }
+    
+    /* Changing the outer box */
+    .outer-box {
+      background-color: #fcaa17;
+      text-align: left; 
+      border-radius: 20px; 
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
+      margin-top: 0px;
+      padding-bottom: 20px;
+      font-family: 'gtam', sans-serif;
+      position: absolute; /* Removes it from the document flow */
+      opacity: 0; /* Makes it invisible */
+      height: 0; /* Ensures no space is taken up */
+      overflow: hidden; /* Prevents any content from affecting layout */
+    }
+  }
+  
+  "
+  )
+),
+
+# ------------------------ Defining the Help Box -------------------------------
+
+  # Adding the help button
   tags$button(
     id = "help_button",
     class = "help-button",
@@ -119,944 +925,206 @@ ui <- fluidPage(
   div(
     class = "help-box",
     div(class = "help-box-content",
-        tags$p("Download", style="font-size:30px; font-family: 'gtam2';"),
+        tags$p("Download", class="help-box-titles"),
         tags$p("Click the button below to download your filtered data.")
     ),
     downloadButton("downloadData", ""),
     div(class = "help-box-content",
-        tags$p("Summary", style="font-size:30px; font-family: 'gtam2';"),
+        tags$p("Summary", class="help-box-titles"),
         tags$p("This comprehensive project contains 55 unique questions regarding police killings, misconduct, and or personnel from 330+ law 
                enforcement agencies across Louisiana spanning 60+ years, for a total of 120,000+ quick facts. We created this project to make
                actionable insights easy to search, find, and share."),
         
         tags$br(),
         
-        tags$p("Sources", style="font-size:30px; font-family: 'gtam2';"),
+        tags$p("Sources", class="help-box-titles"),
         tags$p("The data sources used in this tool include the ", 
                tags$a(href = "https://llead.co/", "Louisiana Law Enforcement and Accountability Database"), "(Updated February 10th, 2024), ",
                tags$a(href = "https://mappingpoliceviolence.org/", "Mapping Police Violence"), "(Updated September 10th, 2024), and the ",
                tags$a(href = "https://cde.ucr.cjis.gov/", "FBI Crime Explorer Law Enforcement Personnel Data"), "(Updated February 10th, 2024)."),
         tags$br(),
         
-        tags$p("Usage", style="font-size:30px; font-family: 'gtam2';"),
-        tags$p("Generating a Question", style="font-size:20px; font-family: 'gtam2';"),
+        tags$p("Usage", class="help-box-titles"),
+        tags$p("Generating a Question", class="help-box-subtitles"),
         tags$p("You can either generate a question using the 'random' button or select a question using the three categories at the top of the tool and selecting the 'save' button."),
         
         tags$br(),
         
-        tags$p("Sorting Your Questions", style="font-size:20px; font-family: 'gtam2';"),
+        tags$p("Sorting Your Questions", class="help-box-subtitles"),
         tags$p("You can sort your saved questions by using the 'sort by' button in the left-hand-side of the tool. The sort button orders the saved questions alphabetically (A-Z) for 'Question' and 'Agency' and from high to low for 'Year'."),
-        
-        # tags$br(),
-        
-        #tags$p("Ranking Questions", style="font-size:20px; font-family: 'gtam2';"),
-        # tags$p("The ranks can be found in the bottom left corner of each fact box. If you are sorting by a given category (Question, Agency, or Year) and have more than one saved question with the same category (same Question, Agency, or Year), then these facts will be sorted from higher to lower numeric value, with the higher value having a higher rank. For example, if you are sorting by 'Question' and you have two saved facts with the question: 'How many total officers were employed by', then these facts would be ordered from the fact with the higher value (rank 1) to the fact with the lower value (rank 2)."),
         
         tags$br(),
         
-        tags$p("Deselecting a Question",style="font-size:20px; font-family: 'gtam2';"),
+        tags$p("Deselecting a Question",class="help-box-subtitles"),
         tags$p("You can deselect a question by clicking its check-box on the left-hand-side of the tool."),
         
         tags$br(),
         
-        tags$p("Removing all Questions",style="font-size:20px; font-family: 'gtam2';"),
+        tags$p("Removing all Questions",class="help-box-subtitles"),
         tags$p("You can clear all saved questions by clicking the 'remove' icon at the top of the tool."),
         
         tags$br(),
         
-        tags$p("Disclaimer", style="font-size:30px; font-family: 'gtam2';"),
+        tags$p("Disclaimer", class="help-box-titles"),
         tags$p("All of the information accessible from this tool is generated using publicly accessible resources. As a result, we cannot verify the accuracy of any of the numbers generated."),
         
         tags$br(),
         
-        tags$p("Questions", style="font-size:30px; font-family: 'gtam2';"),
+        tags$p("Questions", class="help-box-titles"),
         tags$p("If you have any questions or concerns about the content of this tool, you can contact ", tags$a(href = "mailto:eappelson@laaclu.org", "eappelson@laaclu.org."))
     )
   ),
+
+
+# ------------------- Defining the Introductory Screen UI  ---------------------
   
-  
-  # Defining the website style
-  tags$style(HTML("
-  
-#downloadData {
-        display: block;
-  margin: 0 auto;
-  margin-top: 0px; /* Adjust as needed */
-  width: 50%;
-  padding: 10px;
-  margin-bottom: 0px;
-    background-color: #0055AA;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-    border-radius: 15px;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-    
-#downloadData:active  {
-    background-color: #ADD8E6;
-    box-shadow: inset 0 0 4px 4px rgba(173, 216, 230, 1) !important
-}
-    
-/* Importing GT America font compressed bold */
-@font-face {
-    font-family: 'gtam';
-    src: url('https://static.aclu.org/fonts/GT-America-Compressed-Regular.woff2') format('woff2');
-    font-weight: bold;
-}
-
-@font-face {
-    font-family: 'gtam2';
-    src: url('https://static.aclu.org/fonts/GT-America-Compressed-Bold.woff2') format('woff2');
-    font-weight: bold;
-}
-
-@font-face {
-    font-family: 'century';
-    src: url('https://static.aclu.org/fonts/CenturySchoolbook-Regular-webfont.woff') format('woff');
-}
-
-
-/* Importing fonts from Google */
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@200..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Roboto:wght@300..700&family=Open+Sans:wght@300..700&display=swap');
-
-/* Applying Sans-Serif to various objects defined below */
-.help-box, body, .rounded-box{
-    font-family: 'Roboto', 'Open Sans', sans-serif
-}
-
-.help-box, body, .rounded-box{
-    font-family: 'century'
-}
-
-/* Applying GT America to various objects defined below */
-.rank, .ribbon, .social-links a,.source-text {
-    font-family: 'gtam' !important;
-}
-
-    
-/* Adding to the checkbox margin */
-#saved_checkboxes {
-    margin-top: 20px;
-}
-
-/* Defining the ribbon question at the top of the boxes */
-.ribbon {
-  position: relative;
-  top: -40px; 
-  left: 50%; 
-  width: 400px;
-  transform: translateX(-50%);
-  text-align: center; 
-  background-color: #FCAA17; 
-  border-top-left-radius: 25px; 
-  border-top-right-radius: 25px;
-  color: #FFFFFF; 
-  font-weight: bold;
-  padding: 10px; 
-  z-index: 1;
-  font-size: 25px;
-  transition: all 0.3s ease; 
-}
-
-.shiny-notification {
-    background-color: #FCAA17; 
-    font-family: 'gtam';
-    color: white; 
-    border-radius: 5px;
-    padding: 10px; 
-    font-size: 25px; 
-    z-index: 9999;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-    border: none;
-    opacity: 0.90;
-
-}
-
-.shiny-notification-title {
-    font-weight: normal; /* Make title bold */
-}
-
-/* Defining the rounded answer box */
-.rounded-box {
-  position: relative; 
-  z-index: 1;
-  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTL2zA7fqOjSwqidu1i05tM5sSZjVIbAlSDpXtHX0I0g&s'), linear-gradient(to bottom right, #0055AA, #0055AA);
-  background-size: 70px auto, cover;
-  background-position: right bottom, center;
-  background-repeat: no-repeat;
-  border-radius: 25px; 
-  padding: 40px 40px 40px; 
-  width: 400px; 
-  font-size: 25px;
-  text-align: left;
-  font-weight: normal;
-  margin: 20px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  color: #FFFFFF; 
-  transition: all 0.3s ease; 
-  margin-bottom: 40px; 
-  font-family: 'century';
-}
-
-/* Hover effect for the boxes */
-.rounded-box:hover {
-  transform: scale(1.10);
-  box-shadow: 0px 0px 16px  #FEF98B; 
-  transition: all 0.5s ease; 
-  filter: brightness(115%);
-}
-
-  
-.normal-button-1 {
-  font-size: 30px;
-  color: #025800;
-  margin-top: -10px;
-  border-width: 0px;
-  font-weight: bold;
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-/* Defining Save Button Hover */
-.normal-button-1:hover {
-  color: #012101;
-  border-width: 0px;
-  background-color:#FFFFFF;
-  transform: scale(1.2);
-  transition: all 0.5s ease; 
-}
-
-/* Defining Random Button */
-.normal-button-2 {
-  font-size: 30px;
-  color: #0055aa;
-  margin-top: -10px;
-  border-width: 0px;
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-/* Defining Save Button Hover */
-.normal-button-2:hover {
-  font-size: 30px;
-  color: #001326;
-  background-color:#FFFFFF;
-  margin-top: -10px;
-  transform: scale(1.2); 
-  transition: all 0.5s ease; 
-}
-
-/* Defining Clear Button */
-.normal-button-3 {
-  font-size: 30px;
-  color: #ef404e;
-  border-width: 0px;
-  transition: transform 0.3s ease, filter 0.3s ease; 
-}
-
-/* Defining Clear Button Hover */
-.normal-button-3:hover {
-  transform: scale(1.2);
-  color: #260204;
-  border-width: 0px;
-  background-color:#FFFFFF;
-  transition: all 0.5s ease; 
-}
-
-/* Defining the rank of each answer */
-.rank {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  font-size: 14px;
-  color: #0055AA;
-  width: 30px; 
-  height: 30px;
-  background-color: #FCAA17; 
-  border-radius: 50%; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-   /* Removing rank */
-   .rank {
-      display: none;
-   }
-
-/* Social links */
-.social-links {
-  position: absolute;
-  top: 45%;
-  right: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  color: #FCAA17;
-}
-
-/* Individual social link */
-.social-links a {
-  color: #FCAA17; 
-}
-
-/* Individual social link hover */
-.social-links a:hover {
-  color: #FED07E !important;
-  transform: scale(1.25);
-  transition: all 0.5s ease; 
-}
-
-
-/* Ribbon colors for misconduct, killing, and personnel questions */
-.ribbon-misconduct {
-  background-color: #ef404e;
-}
-.ribbon-killing {
-  background-color: #130f54;
-}
-.ribbon-personnel {
-  background-color: #fcaa17; 
-}
-
-/* Defining source-text style */
-.source-text {
-  color: #FCAA17; 
-  font-size: 16px;
-  font-style: italic;
-  padding-right: 20px;
-}
-
-/* Defining source-text hover */
-.source-text:hover {
-  color: #FEC051; 
-}
-
-/* Defining the inner box */
-.inner-box {
-  background-color: white; 
-  padding-bottom: 0px; 
-  padding-left: 10px; 
-  padding-right: 10px;
-  border-radius: 20px;
-  font-size:25px;
-  font-family: 'gtam', sans-serif;
-}
-
-/* Defining the outer box */
-.outer-box {
-  background-color: #fcaa17;
-  text-align: left; 
-  border-radius: 20px; 
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
-  margin-top: 20px;
-  padding-bottom: 0px;
-  font-family: 'gtam', sans-serif;
-}
-
-/* Defining the output box container */
-.column-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-/* Removing the border selected choices */
-select:focus {
-  outline: none; 
-}
-
-/* Making custom checkbox CSS */
-.custom-checkbox-group .shiny-input-container {
-    display: flex;
-    flex-direction: column;
-}
-.custom-checkbox-group .shiny-input-container .checkbox label {
-    display: flex;
-    align-items: center;
-}
-.custom-checkbox-group .shiny-input-container .checkbox label input[type='checkbox'] {
-    margin-right: 5px;
-
-}
-
-/* Styling of help-button*/
-.help-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 70px; 
-    height: 70px;
-    background-color: #ef404e;
-    color: white;
-    border-style: solid;
-    border-width: 0px;
-    border-color: #ffffff;
-    border-radius: 50%; 
-    padding: 15px;
-    font-size: 30px;
-    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    z-index: 3000;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Styling the help button box */
-.help-box {
-    position: fixed;
-    width: 35%;
-    height: 85%;
-    bottom: 60px; 
-    right: 60px; 
-    background-color: #F5F5F5;
-    color: #000000;
-    border-radius: 10px;
-    box-shadow: 0 0 0 1000px rgba(0,0,0,0.5);
-    visibility: hidden;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 2000;
-    font-size: 16px;
-    overflow-y: scroll;
-}
-    
-/* Defining the hover for the help button */
-.help-button:hover {
-    transform: scale(1.10);
-    box-shadow: 0px 0px 16px  #FEF98B; 
-    transition: all 0.5s ease; 
-    filter: brightness(115%);
-}
-
-/* Creating a visibility variable to be used for the help button */
-.visible {
-    visibility: visible;
-    opacity: 1;
-}
- 
-/* Adding padding to the content of the help box*/
-.help-box-content {
-  padding: 20px; 
-}
-
-.question-content {
-  text-align: center; 
-  font-size: 35px;
-  font-weight: normal;
-  transition: all 0.5s ease; 
-  font-family: 'gtam2';
-  margin-top: 80px;
-}
-
-.how-use {
-  font-size: 25px; 
-  font-style: italic; 
-  color: #747474;
-  font-weight: normal;
-  font-family: 'gtam' !important;
-  background-color: white;
-}
-
-
-.modal-title {
-         font-family: 'gtam2';
-        font-size: 35px;
-        color: #0055AA;
-        text-align: center;
-        font-weight: bold;
-    }
-    .modal-body {
-        font-family: 'Open Sans', sans-serif;
-        font-size: 16px;
-    }
-
-
-
-
-
-
-
-
-/* Container to align buttons in a row */
-.button-container {
-    display: flex;
-    justify-content: center; /* Center buttons horizontally */
-    gap: 20px; /* Space between buttons, adjust as needed */
-}
-
-/* General button style for text underneath the icon */
-.normal-button {
-    font-size: 30px; /* Adjust the font size for the text */
-    color: #0055AA; /* Default color, can be overridden */
-    background-color: transparent;
-    border-width: 0px;
-    font-weight: bold;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.normal-button .fa {
-    font-size: 30px; /* Adjust icon size as needed */
-}
-
-.normal-button span {
-    font-size: 18px; /* Adjust font size for the text */
-    margin-top: 5px; /* Space between icon and text */
-    display: block;
-}
-
-/* Specific styles for Save Button */
-.normal-button-1 {
-    color: #025800;
-}
-
-.normal-button-1:hover {
-    color: #012101;
-    background-color: transparent;
-}
-
-/* Specific styles for Random Button */
-.normal-button-2 {
-    color: #0055AA;
-}
-
-.normal-button-2:hover {
-    color: #001326;
-    background-color: transparent;
-}
-
-/* Specific styles for Clear Button */
-.normal-button-3 {
-    color: #ef404e;
-    margin-top: -10px;
-}
-
-.normal-button-3:hover {
-    color: #260204;
-    background-color: transparent;
-}
-
-}
-")),
   # Defining the UI
   tags$div(
     id = "mainScreen",
-    style = paste0(
-      "height: 100vh;",
-      "display: flex;",
-      "flex-direction: column;",
-      "justify-content: center;",
-      "align-items: center;",
-      "font-size: 50px;",
-      "font-weight: 700;",
-      "color: #0055AA;",
-      "text-align: center;",
-      "font-family: 'gtam2';",
-      "text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);",
-      "margin: 0;",
-      "background-image: url('https://aclujusticelab.org/wp-content/uploads/2020/12/HomePage_HeroTexture.png');",
-      "background-size: cover;",
-      "background-position: center;",
-      "background-repeat: no-repeat;"
-    ),
+    class = "intro-screen",
     tags$h1(
       "POLICE VIOLENCE IN LOUISIANA,",
-      style = "color: black; font-size: 56px; font-weight: 900; letter-spacing: 3px; margin-bottom: 12px;"
+      class = "intro-screen-title"
     ),
     tags$h2(
       "BY THE FACTS",
-      style = "font-size: 40px; font-weight: 400; color: #0054AA; font-style: italic; margin-top: 0; margin-bottom: 30px; line-height: 1.2;"
+      class = "intro-screen-subtitle"
     ),
     tags$button(
       id = "continueBtn",
       "Continue",
-      style = "margin-top: 30px; font-size: 20px; padding: 10px 30px; font-family: 'gtam2'; font-weight: 600; color: #fff; background-color: #0055AA; border: none; border-radius: 6px; cursor: pointer; box-shadow: 2px 2px 6px rgba(0, 85, 170, 0.5);"
+      class = "intro-screen-button"
     ),
     tags$div(
-      style = "position: fixed; bottom: 20px; left: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;",
+      class = "intro-screen-link-container",
       tags$a(
         href = "https://aclujusticelab.org",
         target = "_blank",  # optional, opens link in new tab
         tags$img(
           src = "https://aclujusticelab.org/wp-content/uploads/2020/12/ACLULA_JusticeLabStyleGuide-02.png",
-          style = "height: 70px; width: auto; cursor: pointer;"
+          class = "intro-screen-link"
         )
       )
     )
   ),
-  tags$div(id = "restContent", 
-           style = "
-    background-color: white;
-    background-image: url('https://aclujusticelab.org/wp-content/uploads/2020/12/HomePage_HeroTexture.png');
-    background-repeat: repeat;
-  ",
-    tags$br(),
+
+# ------------------------- Defining the Main Page UI  -------------------------
+
+tags$div(
+  id = "restContent",
+  class = "main-page",
+  
+  tags$br(),
+  
+  # Questions at Top
+  tags$div(
+    class = "question-content",
+    
+    tags$p(
+      # Question 1 select
+      tags$select(
+        id = "question1",
+        lapply(c("All Questions", unique(data$question_p1)), function(option) {
+          tags$option(option, value = option)
+        })
+      ),
+      
+      # Question 2 select
+      tags$select(
+        id = "question2",
+        lapply(c("All Agencies", unique(data$question_p2)), function(option) {
+          tags$option(option, value = option)
+        })
+      ),
+      
+      "in",
+      
+      # Question 3 select
+      tags$select(
+        id = "question3",
+        lapply(c("All Years", unique(data$question_p3)), function(option) {
+          tags$option(option, value = option)
+        })
+      ),
+      
+      "?"
+    ),
+    
+    # How to use instructions
+    tags$p(
+      'Select a question, agency, and year by clicking the drop-downs above. Press the "Submit" button to see the answer below.',
+      br(),
+      class = "how-use"
+    ),
+    
+    # Buttons: Save, Random, Clear
     tags$div(
+      class = "button-container",
+      
+      actionButton(
+        "save_button",
+        HTML('<i class="fas fa-paper-plane"></i><span>Submit</span>'),
+        class = "normal-button normal-button-1",
+        onclick = "disableButtonsTemporarily()"
+      ),
+      
+      actionButton(
+        "random_button",
+        HTML('<i class="fas fa-dice"></i><span>Randomize</span>'),
+        class = "normal-button normal-button-2",
+        onclick = "disableButtonsTemporarily()"
+      ),
+      
+      actionButton(
+        "clear_button",
+        HTML('<i class="fa fa-trash"></i><span>Clear</span>'),
+        class = "normal-button normal-button-3",
+        onclick = "disableButtonsTemporarily()"
+      )
+    )
+  ),
+  
+  tags$br(),
+  
+  # Sidebar Panel
+  sidebarPanel(
+    tags$div(
+      id = "sort_group_wrapper",
+      
       tags$div(
-        # Adding some extra css do define the question layout
-        class = "question-content",
-        tags$p(
-          # Question 1
-          tags$select(
-            id = "question1",
-            lapply(c("All Questions", unique(data$question_p1)), function(option) {
-              tags$option(option, value = option)
-            })
-          ),
-          
-          # Question 2
-          tags$select(
-            id = "question2",
-            lapply(c("All Agencies", unique(data$question_p2)), function(option) {
-              tags$option(option, value = option)
-            })
-          ),
-          "in",
-          
-          # Question 3
-          tags$select(
-            id = "question3",
-            lapply(c("All Years", unique(data$question_p3)), function(option) {
-              tags$option(option, value = option)
-            })
-          ),
-          "?"
-        ),
+        class = "sort-by-box",
         
-        # How to use
-        tags$p(
-          'Select a question, agency, and year in the drop-downs above. Press the "Submit" button to see the answer below.', 
-          br(),
-          class = "how-use"
-        ),
-        # Defining the save, random, and clear buttons   
         tags$div(
-          class = "button-container",
-          actionButton("save_button",  
-                       HTML('<i class="fas fa-paper-plane"></i><span>Submit</span>'),  
-                       class = "normal-button normal-button-1",
-                       onclick = "document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true); setTimeout(() => document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false), 300);"
+          tags$span(
+            "Sort by:",
+            class = "sort-by"
           ),
-          actionButton("random_button",  
-                       HTML('<i class="fas fa-dice"></i><span>Randomize</span>'),
-                       class = "normal-button normal-button-2",
-                       onclick = "document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true); setTimeout(() => document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false), 300);"
-          ),
-          actionButton("clear_button",  
-                       HTML('<i class="fa fa-trash"></i><span>Clear</span>'),
-                       class = "normal-button normal-button-3",
-                       onclick = "document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = true); setTimeout(() => document.querySelectorAll('.normal-button').forEach(btn => btn.disabled = false), 300);"
+          
+          tags$select(
+            id = "sort",
+            lapply(c("None", "Question", "Agency", "Year"), function(option) {
+              tags$option(option, value = option)
+            })
           )
-        ),
-        
-        # Importing Java Script for Select2
-        tags$link(rel = "stylesheet", href = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css"),
-        tags$script(src = "https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"),
-        tags$style(HTML("
-      
-/* Defining Select2 styling */
-.select2-container--default .select2-selection--single {
-    border: none !important;
-    margin-top: -10px; 
-    height: auto; 
-    line-height: 1.5;
-  }
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-  line-height: 1.2; 
-  }
-.select2-dropdown {
-    border: none !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5); 
-    font-size: 18px;
-    background-color: #F5F5F5;
-  }
-  
-/* Defining content that changes with the page size */
-
-/* Defining rounded-box width and the ACLU symbol based on the screen size */
-
-@media only screen and (max-width: 450px) {
-  .rounded-box {
-    width: calc(100% - 40px); 
-    background-size: 70px auto, cover;
-  }
-}
-
-@media only screen and (min-width: 451px) {
-  .rounded-box {
-    width: calc(100% - 40px); 
-    background-size: 70px auto, cover;
-  }
-}
-
-@media only screen and (min-width: 1001px) {
-  .rounded-box {
-    width: calc(50% - 40px); 
-    background-size: 70px auto, cover;
-  }
-}
-@media only screen and (min-width: 1400px) {
-  .rounded-box {
-      background-size: 70px auto, cover;
-  }
-}
-@media only screen and (min-width: 1600px) {
-  .rounded-box {
-    width: calc(33.3333% - 40px);
-  }
-}
-
-/* Defining ribbon width based on the screen size */
-@media only screen and (max-width: 600px) {
-  .ribbon {
-    width: calc(100% + 80px); 
-  }
-}
-@media only screen and (min-width: 601px) {
-  .ribbon {
-    width: calc(100% + 80px);
-  }
-}
-@media only screen and (min-width: 1200px) {
-  .ribbon {
-    width: calc(100% + 80px);
-  }
-}
-  
-/* Defining the select2 width based on the screen size */
-@media screen and (max-width: 786px) {
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    max-width: 350px;
-  }
-}
-  
-/* Defining phone styling */
-@media screen and (max-width: 450px) {
-
-    .how-use {
-      font-size: 22px; 
-      font-style: italic; 
-      color: #747474;
-      background-color: white;
-      font-weight: normal;
-      font-family: 'gtam' !important;
-    }
-    
-    .question-content {
-      text-align: center; 
-      font-size: 30px;
-      font-weight: bold;
-      transition: all 0.5s ease; 
-      font-family: 'gtam2';
-    }
-    
-    .ribbon {
-      font-size: 22px;
-      transition: all 0.3s ease; 
-      font-style: italic;
-    }
-
-    /* Removing scaling, shadow, and brightness */
-   .rounded-box:hover {
-    transform: scale(1);
-    box-shadow: 0px; 
-    transition: all 0.5s ease; 
-    filter: brightness(100%);
-   }
-   
-   /* Removing rank */
-   .rank {
-      display: none;
-   }
-   
-   /* Moving help-box */
-  .help-box {
-        bottom: 60px; 
-        right: 20px;
-        width: 90%; 
-  }
-  
-  /* Changing font to San-Serif */
-
-  
-  /* Removing scale and transition */
-  .normal-button-1:hover {
-    transform: scale(1); 
-    transition: none;
-  }
-  .normal-button-2:hover {
-    transform: scale(1); 
-    transition: none;
-  }
-  .normal-button-3:hover {
-    transform: scale(1); 
-    transition: none;
-  }
-  
-  /* Moving social links down */
-  .social-links {
-    top: 50%;
-  }
-  
-  /* Removing sort and group */
-  #sort_group_wrapper {
-        display: none;
-    }
-    
-  /* Changing the inner box */
-  .inner-box {
-    background-color: white; 
-    padding-bottom: 10px; 
-    padding-top: 10px; 
-    padding-left: 10px; 
-    padding-right: 10px;
-    border-radius: 20px;
-    font-size:25px;
-    font-family: 'gtam', sans-serif;
-  }
-  
-.outer-box {
-  background-color: #fcaa17;
-  text-align: left; 
-  border-radius: 20px; 
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); 
-  margin-top: 0px;
-  padding-bottom: 20px;
-  font-family: 'gtam', sans-serif;
-  position: absolute; /* Removes it from the document flow */
-  opacity: 0; /* Makes it invisible */
-  height: 0; /* Ensures no space is taken up */
-  overflow: hidden; /* Prevents any content from affecting layout */
-}
-
-/* Changing the sidebar panel based on the screen width */
-@media only screen and (max-width: 786px) {
-  .sidebarPanel {
-    border: 1px solid black;
-    border-radius: 30px;
-    padding: 10px;
-    border-width: 0px;
-  }
-}
-
-/* Changing select2 max width*/
-@media screen and (min-width: 787px) {
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    max-width: 600px;
-  }
-}
-  ")),
-        
-        # Defining more Java
-        tags$script(HTML("
- $(document).ready(function() {
-  // Initialize select2 dropdowns
-  $('#question1, #question2, #question3').select2({
-    placeholder: 'Search for a question',
-    width: 'auto'
-  }).on('select2:open', function() {
-    $(this).data('select2').$dropdown.addClass('select2-dropdown');
-  });
-  
-  $('#sort, #group').select2({
-    placeholder: 'Search for a question',
-    width: 'auto',
-    minimumResultsForSearch: Infinity
-  }).on('select2:open', function() {
-    $(this).data('select2').$dropdown.addClass('select2-dropdown');
-  });
-
-  // Hover effect
-  $('#question1, #question2, #question3').parent().find('span.select2-selection').on({
-    mouseover: function() {
-      $(this).css({
-        'background-color': '#FEF98B',
-        'color': 'black',
-        'transform': 'scale(1.05)', 
-        'transition': 'all 0.5s ease'
-      });
-    },
-    mouseout: function() {
-      $(this).css({
-        'background-color': '#FFFFFF',
-        'color': '',
-        'transform': '',
-        'transition': 'all 0.5s ease'
-      });
-    }
-  });
-  
-  $('#sort, #group').parent().find('span.select2-selection').on({
-    mouseover: function() {
-      $(this).css({
-        'background-color': '#FEF98B',
-        'color': 'black',
-        'transform': 'scale(1.05)', 
-        'transition': 'all 0.5s ease',
-        'margin-bottom': '-5px'
-        });
-    },
-    mouseout: function() {
-      $(this).css({
-        'background-color': '#FFFFFF',
-        'color': '',
-        'transform': '',
-        'transition': 'all 0.5s ease',
-        'margin-bottom': '-5px'
-      });
-    }
-  });
-});
-  ")),
-      ),
-    ),
-    # Space
-    tags$br(), 
-    
-    # Defining the sidebar panel
-    sidebarPanel(
-      
-      tags$div(
-        
-        # Defining sort
-        tags$div(
-          tags$div(
-            tags$span(
-              "Sort by:",
-              style = "font-size: 25px; font-weight: normal;font-family: 'gtam';top: -50px;" 
-            ),
-            tags$select(
-              id = "sort",
-              lapply(c("None",
-                       "Question",
-                       "Agency",
-                       "Year"), function(option) {
-                         tags$option(option, value = option)
-                       }),
-              onmouseover = "this.style.backgroundColor='#FEF98B'; this.style.color='black';",
-              onmouseout = "this.style.backgroundColor=''; this.style.color='';"
-            ))
-          ,
-          style = "font-size: 27px;background-color: white; padding: 20px; border-radius: 20px;font-family: 'gtam', sans-serif"
-        ),
-        id = "sort_group_wrapper"),
-      # Checkbox output
-      tags$div(
-        uiOutput("saved_checkboxes"),
-        class = "inner-box"
-      ),
-      class = "outer-box",
+        )
+      )
     ),
     
-    # Outputting the boxes
-    uiOutput("boxes"),
-  ))
+    # Saved checkboxes output
+    tags$div(
+      uiOutput("saved_checkboxes"),
+      class = "inner-box"
+    ),
+    
+    class = "outer-box"
+  ),
+  
+  # Output boxes
+  uiOutput("boxes")
+  )
+)
 
+# -------------------------- Defining the Server  -----------------------------
 
 # Defining the server
 server <- function(input, output, session) {
@@ -1409,13 +1477,7 @@ server <- function(input, output, session) {
       
       df <- df %>%
         mutate(
-          supscript = case_when(
-            id == "" ~ "",
-            id == 1 ~ "st",
-            id == 2 ~ "nd",
-            id == 3 ~ "rd",
-            id >= 4 ~ "th"
-          ),
+          
           #question_complex2 = str_to_upper(question_complex)
           question_complex2 = question_complex
           
@@ -1425,11 +1487,6 @@ server <- function(input, output, session) {
       boxes <- lapply(1:nrow(df), function(i) {
         
         id <- df$x1[i]
-        # Answer rank
-        rank <- df$id[i]
-        
-        # Answer rank superscript
-        supscript <- df$supscript[i]
         
         # Answer source
         source <- df$source[i]
@@ -1474,11 +1531,10 @@ server <- function(input, output, session) {
         <i class="fas fa-copy"></i>
         </a>
       </div>
-      <div class="rank">%s <sup> %s </sup></div>
     </div>
   ', 
           # %s inputs
-          ribbon_class, question, fact_text, link, source, fact_text, id, id, fact_text,fact_text, id, rank, supscript)
+          ribbon_class, question, fact_text, link, source, fact_text, id, id, fact_text,fact_text, id)
         
         # Outputting an HTML representation of each box
         HTML(rounded_box)
